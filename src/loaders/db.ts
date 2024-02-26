@@ -26,7 +26,7 @@ const init = async () => {
 
     const db = new DataSource({
       type: 'postgres',
-      url: process.env.POSTGRES_PRISMA_URL,
+      url: process.env.DB_URL,
       synchronize: false,
       entities: models,
       logging: process.env.DB_LOGGING === 'true' ? true : false,
