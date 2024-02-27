@@ -1,5 +1,7 @@
-import { VideoInfo } from './types/TMDB';
-
+export interface IMessageData {
+  message: string;
+  image?: string;
+}
 export type LabelValueObj = {
   value: number | string;
   label: string;

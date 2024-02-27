@@ -1,7 +1,8 @@
+import User from '../models/DB/models/User';
 import Log from '../models/Loggers/Logger';
 import Movie from '../models/Movie';
-// import BotProvider from '../providers/bot/Bot';
-// import TelegramBotProvider from '../providers/bot/Telegram';
+import BotProvider from '../providers/bot/Bot';
+import TelegramBotProvider from '../providers/bot/Telegram';
 import MessageProvider from '../providers/message/Message';
 import TelegramMessageProvider from '../providers/message/Telegram';
 import { AnyMediaData, IMovieData, IShowData } from '../types';
@@ -14,22 +15,26 @@ const TMDB = new TmbdService();
 export default class NotificationService {
   messageService = new MessageService();
   messageProviders: MessageProvider[];
-  // botProviders: BotProvider<unknown>[];
+  botProviders: BotProvider<unknown>[];
   log = new Log('NotificationService');
 
   constructor() {
     this.messageProviders = [new TelegramMessageProvider()];
-    // this.botProviders = [new TelegramBotProvider()];
+    this.botProviders = [new TelegramBotProvider()];
   }
 
-  private async notifyViaMessage(media: AnyMediaData, type: MediaType) {
+  private getMessage(media: AnyMediaData, type: MediaType) {
     let message = '';
     if (type == 'movie') {
       message = this.messageService.getMovieMessage(media as IMovieData);
     } else if (type == 'tv') {
       message = this.messageService.getShowMessage(media as IShowData);
     }
+    return message;
+  }
 
+  private async notifyViaMessage(media: AnyMediaData, type: MediaType) {
+    const message = this.getMessage(media, type);
     for (const provider of this.messageProviders) {
       try {
         const result = await provider.sendToChannels({
@@ -48,7 +53,33 @@ export default class NotificationService {
     }
   }
 
-  // private async notifyViaBot(media: AnyMediaData, type: MediaType) {}
+  private async notifyViaBot(media: AnyMediaData, type: MediaType) {
+    const message = this.getMessage(media, type);
+
+    const destinations = await User.find();
+
+    for (const provider of this.botProviders) {
+      for (const destination of destinations) {
+        try {
+          const result = await provider.send(
+            {
+              message,
+              image: media.posterUrl,
+            },
+            destination.chatId
+          );
+
+          this.log.info(
+            `Message trough provider ${provider.constructor.name} to user ${destination.name}: ${result}`
+          );
+        } catch (error) {
+          this.log.error(
+            `Error sending message trough provider ${provider.constructor.name} to user ${destination.name}`
+          );
+        }
+      }
+    }
+  }
 
   public async notifyNewMovie(payload: JellyfinMovieNotification) {
     try {
@@ -71,8 +102,8 @@ export default class NotificationService {
       });
 
       this.notifyViaMessage(movie, 'movie');
+      this.notifyViaBot(movie, 'movie');
       return true;
-      // this.notifyViaBot(movie, 'movie');
     } catch (error: any) {
       this.log.error('Error notificating new movie', error);
       return false;

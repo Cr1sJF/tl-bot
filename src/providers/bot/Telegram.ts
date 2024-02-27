@@ -1,6 +1,7 @@
 import { Bot } from 'grammy';
 import BotProvider from './Bot';
 import Log from '../../models/Loggers/Logger';
+import { IMessageData } from '../../types';
 
 const log = new Log('TelegramBotProvider');
 const bot = new Bot(process.env.TL_BOT_ID!);
@@ -10,9 +11,18 @@ export default class TelegramBotProvider extends BotProvider<Bot> {
     return bot;
   }
 
-  async send(message: string, chatId: string): Promise<boolean> {
+  async send(message: IMessageData, chatId: string): Promise<boolean> {
     try {
-      await bot.api.sendMessage(chatId, message);
+      if (message.image) {
+        await bot.api.sendPhoto(chatId, message.image, {
+          caption: message.message,
+          parse_mode: 'HTML',
+        });
+      } else {
+        await bot.api.sendMessage(chatId, message.message, {
+          parse_mode: 'HTML',
+        });
+      }
 
       return true;
     } catch (error: any) {
