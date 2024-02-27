@@ -1,11 +1,5 @@
-import { IMediaData, IMovieData, IShowData } from '../types';
+import { IMovieData, IShowData } from '../types';
 
-// enum MediaType {
-//   MOVIE = 'NUEVA PELICULA',
-//   SHOW = 'NUEVA SERIE',
-//   SEASON = 'NUEVA TEMPORADA',
-//   EPISODE = 'NUEVO CAPITULO',
-// }
 const TYPE_TITLE = 'TITLE';
 const TYPE_NEW_LINE = 'NEW_LINE';
 interface MessageData {
@@ -15,12 +9,14 @@ interface MessageData {
 
 const typeToEmoji: Record<string, string> = {
   name: '✒️',
-  overview: '💭',
+  tagline:  '💭',
+  overview: '📖',
+  seasons: '📺',
   year: '📅',
   rating: '⭐️',
   genres: '🎭',
   runtime: '🕑',
-  providers: '📺',
+  providers: '🍿',
   trailer: '🎬',
   status: 'ℹ️',
 };
@@ -45,20 +41,20 @@ export default class MessageService {
     items.forEach((item) => {
       let htmlItem = '';
       if (item.type == TYPE_TITLE) {
-        htmlArray.push(`<h2>🚨${item.value}🚨</h2> \n`);
+        htmlArray.push(`<b>🚨${item.value}🚨</b> \n`);
       } else if (item.type == TYPE_NEW_LINE) {
         htmlArray.push(`\n`);
       } else if (item.type == 'trailer' && item.value) {
         const emoji = typeToEmoji[item.type] || ''; // Obtener emoji del mapeo
-        htmlItem = `<p>${emoji}:</p> <a href="${item.value}">Ver Trailer</a> \n`;
+        htmlItem = `${emoji}: <a href="${item.value}">Ver Trailer</a> \n`;
       } else {
         const emoji = typeToEmoji[item.type] || ''; // Obtener emoji del mapeo
         // const formattedValue = item.value.replace(/\n/g, '<br>'); // Reemplazar saltos de línea con <br>
 
         if (item.value) {
-          htmlItem = `<p>${emoji}: ${
-            item.type == 'name' ? '<i>' + item.value + '</i>' : item.value
-          }</p> \n`;
+          htmlItem = `${emoji}: ${
+            item.type == 'name' || item.type == 'tagline' ? '<i>' + item.value + '</i>' : item.value
+          } \n`;
         }
       }
 
@@ -74,15 +70,16 @@ export default class MessageService {
         { type: TYPE_TITLE, value: 'NUEVA PELÍCULA' },
         { type: TYPE_NEW_LINE },
         { type: 'name', value: data.name },
+        { type: 'tagline', value: data.tagline },
         { type: TYPE_NEW_LINE },
         { type: 'overview', value: data.overview },
         { type: TYPE_NEW_LINE },
         { type: 'year', value: data.year },
         { type: 'rating', value: data.rating },
-        { type: 'genres', value: data.genres.join(' | ') },
+        { type: 'genres', value: data.genres },
         { type: 'runtime', value: data.runtime },
         { type: TYPE_NEW_LINE },
-        { type: 'providers', value: data.providers.join(' | ') },
+        // { type: 'providers', value: data.providers.join(' | ') },
         { type: TYPE_NEW_LINE },
         { type: 'trailer', value: data.trailer },
       ]);
@@ -107,12 +104,12 @@ export default class MessageService {
       { type: 'status', value: this.getStatus(data.status) },
       { type: 'year', value: data.years },
       { type: 'rating', value: data.rating },
-      { type: 'genres', value: data.genres.join(' | ') },
+      { type: 'genres', value: data.genres },
       { type: 'runtime', value: data.runtime },
       { type: TYPE_NEW_LINE },
-      { type: 'providers', value: data.providers.join(' | ') },
+      // { type: 'providers', value: data.providers },
       { type: TYPE_NEW_LINE },
-      { type: 'trailer', value: data.trailer },
+      // { type: 'trailer', value: data.trailer },
     ]);
 
     return msg;
@@ -137,12 +134,12 @@ export default class MessageService {
       { type: 'status', value: this.getStatus(data.status) },
       { type: 'year', value: data.years },
       { type: 'rating', value: data.rating },
-      { type: 'genres', value: data.genres.join(' | ') },
+      { type: 'genres', value: data.genres },
       { type: 'runtime', value: data.runtime },
       { type: TYPE_NEW_LINE },
-      { type: 'providers', value: data.providers.join(' | ') },
+      // { type: 'providers', value: data.providers },
       { type: TYPE_NEW_LINE },
-      { type: 'trailer', value: data.trailer },
+      // { type: 'trailer', value: data.trailer },
     ]);
 
     return msg;

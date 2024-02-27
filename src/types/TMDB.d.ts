@@ -55,7 +55,6 @@ export interface TmdbResponseBase {
   status: string;
   tagline: string;
   vote_average: number;
-  'watch/providers': Providers;
   videos: {
     results: VideoInfo[];
   };
@@ -71,6 +70,11 @@ export interface TmdbMovieResponse extends TmdbResponseBase {
   title: string;
   video: boolean;
   vote_count: number;
+}
+
+export  interface TmdbVideoResponse {
+  id: number;
+  results: VideoInfo[]
 }
 
 export interface TmdbShowResponse extends TmdbResponseBase {
@@ -133,22 +137,6 @@ export interface TmdbFindResponse<T> {
   results: T[];
   total_pages: number;
   total_results: number;
-}
-
-export interface FlatRate {
-  logo_path: string;
-  provider_id: number;
-  provider_name: string;
-  display_priority: number;
-}
-
-export interface LocaleInfo {
-  link: string;
-  flatrate: FlatRate[];
-}
-
-export interface Providers {
-  [locale: string]: LocaleInfo;
 }
 
 export type MediaType = 'movie' | 'tv';

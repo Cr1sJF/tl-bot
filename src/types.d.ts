@@ -1,3 +1,5 @@
+import { VideoInfo } from './types/TMDB';
+
 export type LabelValueObj = {
   value: number | string;
   label: string;
@@ -28,15 +30,31 @@ export interface IMediaData {
   id: number;
   name: string;
   overview: string;
+  tagline: string;
   posterUrl: string;
-  genres: string[];
+  genres: string;
   runtime?: string;
-  providers: string[];
   rating: string;
   trailer?: string;
 }
 
+export interface IMediaDataConstructor {
+  id: number;
+  name: string;
+  overview: string;
+  tagline: string;
+  posterUrl: string;
+  genres: string[];
+  runtime?: number;
+  rating: number;
+  trailer?: string;
+}
+
 export interface IMovieData extends IMediaData {
+  year: string;
+}
+
+export interface IMovieDataConstructor extends IMediaDataConstructor {
   year: string;
 }
 
@@ -46,3 +64,5 @@ export interface IShowData extends IMediaData {
   seasons: number;
   status: string;
 }
+
+export type AnyMediaData = IMediaData | IMovieData | IShowData;

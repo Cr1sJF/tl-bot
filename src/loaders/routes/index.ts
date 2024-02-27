@@ -1,7 +1,7 @@
 import { Application, Request, Response } from "express";
 import Logger from "../../models/Loggers/Logger";
 import jwt from "jsonwebtoken";
-// import Middelware from "./middleware";
+import Middelware from "./middleware";
 import Routes from "../../controllers";
 const log = new Logger("ROUTES");
 
@@ -28,7 +28,7 @@ export const validarToken = async (
 export default async (app: Application) => {
   try {
     log.info("LOADING ROUTES...");
-    // Middelware(app);
+    Middelware(app);
     // app.use(validarToken);
     await Routes(app);
     await log.info("✅ ROUTES LOADED");

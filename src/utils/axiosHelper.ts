@@ -1,8 +1,8 @@
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { CreateAxiosDefaults, AxiosInstance } from "axios";
-import AxiosLogger from "../models/Loggers/Axios";
-import { AxiosConfig } from "../types/Axios";
-const log = new AxiosLogger("AXIOS");
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { CreateAxiosDefaults, AxiosInstance } from 'axios';
+import AxiosLogger from '../models/Loggers/Axios';
+import { AxiosConfig } from '../types/Axios';
+const log = new AxiosLogger('AXIOS');
 
 const getApiUrl = (config: any) => {
   const data = config.config ? config.config : config;
@@ -23,7 +23,7 @@ export default (config?: AxiosConfig) => {
 
     if (config.token) {
       options.headers = {
-        Authorization: "Bearer " + config.token,
+        Authorization: 'Bearer ' + config.token,
       };
     }
 
@@ -32,6 +32,10 @@ export default (config?: AxiosConfig) => {
         username: config.credentials.user,
         password: config.credentials.password,
       };
+    }
+
+    if (config.params) {
+      options.params = config.params;
     }
   }
 
@@ -42,8 +46,8 @@ export default (config?: AxiosConfig) => {
     if (!exclude) {
       log.axiosLog({
         url: getApiUrl(request),
-        method: request.method || "",
-        type: "REQ",
+        method: request.method || '',
+        type: 'REQ',
         data:
           request.data instanceof URLSearchParams
             ? Object.fromEntries(request.data)
@@ -71,7 +75,7 @@ export default (config?: AxiosConfig) => {
         response.data = response.config.customValidator(response.data);
       }
 
-      if (!response.data.hasOwnProperty("success")) {
+      if (!response.data.hasOwnProperty('success')) {
         response.data = {
           success: response.status >= 200 && response.status < 300,
           data: response.data,
@@ -80,9 +84,9 @@ export default (config?: AxiosConfig) => {
 
       log.axiosLog({
         url: getApiUrl(response),
-        method: response.config.method || "",
-        type: "RES",
-        data: response.data,
+        method: response.config.method || '',
+        type: 'RES',
+        data: response.data.success,
       });
 
       return response;
@@ -128,7 +132,7 @@ export default (config?: AxiosConfig) => {
       });
 
       return Promise.reject(error);
-    },
+    }
   );
 
   conector.defaults.transformResponse = (response) => {

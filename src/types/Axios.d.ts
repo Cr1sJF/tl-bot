@@ -12,6 +12,7 @@ type AxiosConfig = {
   timeout?: number;
   responseValidator?: Function;
   headers?: Object;
+  params?: Object;
 };
 
 type AxiosBody = {

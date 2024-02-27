@@ -4,14 +4,19 @@ import {
   TmdbFindResponse,
   TmdbMovieResponse,
   TmdbShowResponse,
+  VideoInfo,
 } from '../types/TMDB';
 import ApiService from './Api';
 
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 export default class TmbdService extends ApiService {
   constructor() {
     super('TMDB', {
       baseUrl: 'https://api.themoviedb.org/3',
       token: process.env.TMDB_API,
+      params: {
+        language: 'es-MX',
+      },
     });
   }
 
@@ -21,7 +26,7 @@ export default class TmbdService extends ApiService {
         `/${type}/` + id,
         {
           params: {
-            append_to_response: 'videos,watch/providers',
+            append_to_response: 'videos',
           },
         }
       );
@@ -84,5 +89,34 @@ export default class TmbdService extends ApiService {
     term: string
   ): Promise<TmdbFindResponse<TmdbShowResponse> | null> {
     return this.find<TmdbShowResponse>(term, 'tv');
+  }
+
+  public parseImage(path: string): string {
+    return IMG_URL + path;
+  }
+
+  public getTrailer(videos: VideoInfo[]): string | undefined {
+    try {
+      let trailer;
+
+      trailer = videos.find(
+        (video) =>
+          video.type === 'Trailer' &&
+          video.site === 'YouTube' &&
+          video.name.toUpperCase().indexOf('SUBTITULADO') !== -1
+      )?.key;
+
+      if (!trailer) {
+        trailer = videos.find(
+          (video) => video.type === 'Trailer' && video.site === 'YouTube'
+        )?.key;
+      }
+
+      return trailer ? `https://www.youtube.com/watch?v=${trailer}` : undefined;
+    } catch (error: any) {
+      this.log.error('Error getting trailer', error);
+
+      return;
+    }
   }
 }
