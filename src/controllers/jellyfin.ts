@@ -19,10 +19,7 @@ router.post('/movie', async (req: Request, res: Response) => {
 router.post('/show', async (req: Request, res: Response) => {
   const data = req.body;
 
-  console.log('PAYLOAD', req.body);
-  const service = new MessageService();
-
-  const result = await service.getShowMessage(
+  const result = await notificator.notifyNewShow(
     typeof data === 'string' ? JSON.parse(data) : data
   );
 
@@ -30,16 +27,13 @@ router.post('/show', async (req: Request, res: Response) => {
     success: result,
   });
 });
+
 router.post('/season', async (req: Request, res: Response) => {
   const data = req.body;
 
-  console.log('PAYLOAD', req.body);
-  const service = new MessageService();
-
-  const result = await service.getShowMessage(
+  const result = await notificator.notifyNewSeason(
     typeof data === 'string' ? JSON.parse(data) : data
   );
-
   res.send({
     success: result,
   });

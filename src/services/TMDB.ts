@@ -3,6 +3,7 @@ import {
   MediaType,
   TmdbFindResponse,
   TmdbMovieResponse,
+  TmdbSeasonResponse,
   TmdbShowResponse,
   VideoInfo,
 } from '../types/TMDB';
@@ -20,10 +21,26 @@ export default class TmbdService extends ApiService {
     });
   }
 
-  private async get<T>(id: string, type: MediaType): Promise<T | null> {
+  private getUrl(ids: string | string[], type: MediaType) {
+    switch (type) {
+      case 'movie':
+        return `/${type}/` + ids;
+      case 'tv':
+        return `/${type}/` + ids;
+      case 'season':
+        return `/tv/${ids[0]}/season/${ids[1]}`;
+      default:
+        return `/${type}/` + ids;
+    }
+  }
+
+  private async get<T>(
+    ids: string | string[],
+    type: MediaType
+  ): Promise<T | null> {
     try {
       const { data } = await this.conector.get<ApiResponse<T>>(
-        `/${type}/` + id,
+        this.getUrl(ids, type),
         {
           params: {
             append_to_response: 'videos',
@@ -77,6 +94,10 @@ export default class TmbdService extends ApiService {
 
   public async getTv(id: string): Promise<TmdbShowResponse | null> {
     return this.get<TmdbShowResponse>(id, 'tv');
+  }
+
+  public async getSeason(showId: string, seasonNumber: number): Promise<TmdbSeasonResponse | null> {
+    return this.get<TmdbSeasonResponse>([showId, seasonNumber.toString()], 'season');
   }
 
   public async searchMovie(

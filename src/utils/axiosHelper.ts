@@ -37,6 +37,10 @@ export default (config?: AxiosConfig) => {
     if (config.params) {
       options.params = config.params;
     }
+
+    if (config.headers) {
+      options.headers = config.headers;
+    }
   }
 
   const conector: AxiosInstance = axios.create(options);

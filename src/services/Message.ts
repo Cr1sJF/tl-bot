@@ -1,4 +1,4 @@
-import { IMovieData, IShowData } from '../types';
+import { IMovieData, ISeasonData, IShowData } from '../types';
 
 const TYPE_TITLE = 'TITLE';
 const TYPE_NEW_LINE = 'NEW_LINE';
@@ -9,7 +9,7 @@ interface MessageData {
 
 const typeToEmoji: Record<string, string> = {
   name: '✒️',
-  tagline:  '💭',
+  tagline: '💭',
   overview: '📖',
   seasons: '📺',
   year: '📅',
@@ -22,19 +22,6 @@ const typeToEmoji: Record<string, string> = {
 };
 
 export default class MessageService {
-  private getStatus(status: string): string {
-    switch (status) {
-      case 'Ended':
-        return 'Finalizada';
-      case 'Returning Series':
-        return 'En emision';
-      case 'Canceled':
-        return 'Cancelada';
-      default:
-        return status;
-    }
-  }
-
   private buildHTML(items: MessageData[]): string {
     const htmlArray: string[] = [];
 
@@ -53,7 +40,9 @@ export default class MessageService {
 
         if (item.value) {
           htmlItem = `${emoji}: ${
-            item.type == 'name' || item.type == 'tagline' ? '<i>' + item.value + '</i>' : item.value
+            item.type == 'name' || item.type == 'tagline'
+              ? '<i>' + item.value + '</i>'
+              : item.value
           } \n`;
         }
       }
@@ -75,9 +64,9 @@ export default class MessageService {
         { type: 'overview', value: data.overview },
         { type: TYPE_NEW_LINE },
         { type: 'year', value: data.year },
-        { type: 'rating', value: data.rating },
-        { type: 'genres', value: data.genres },
-        { type: 'runtime', value: data.runtime },
+        { type: 'rating', value: data.rating.toString() },
+        { type: 'genres', value: data.genres.toString() },
+        { type: 'runtime', value: data.runtime?.toString() },
         { type: TYPE_NEW_LINE },
         // { type: 'providers', value: data.providers.join(' | ') },
         { type: TYPE_NEW_LINE },
@@ -95,21 +84,20 @@ export default class MessageService {
       { type: TYPE_TITLE, value: 'NUEVA SERIE' },
       { type: TYPE_NEW_LINE },
       { type: 'name', value: data.name },
+      { type: TYPE_NEW_LINE },
       { type: 'overview', value: data.overview },
       { type: TYPE_NEW_LINE },
       {
         type: 'seasons',
-        value: `Temporadas: ${data.seasons} | Capitulos: ${data.chapters}`,
+        value: `Temporadas: ${data.seasons} | Capítulos: ${data.chapters}`,
       },
-      { type: 'status', value: this.getStatus(data.status) },
+      { type: 'status', value: data.status },
       { type: 'year', value: data.years },
-      { type: 'rating', value: data.rating },
-      { type: 'genres', value: data.genres },
-      { type: 'runtime', value: data.runtime },
+      { type: 'rating', value: data.rating.toString() },
+      { type: 'genres', value: data.genres.toString() },
+      { type: 'runtime', value: data.runtime?.toString() },
       { type: TYPE_NEW_LINE },
-      // { type: 'providers', value: data.providers },
-      { type: TYPE_NEW_LINE },
-      // { type: 'trailer', value: data.trailer },
+      { type: 'trailer', value: data.trailer },
     ]);
 
     return msg;
@@ -120,26 +108,23 @@ export default class MessageService {
   //   return true;
   // }
 
-  getSeasonMessage(data: IShowData): string {
+  getSeasonMessage(data: ISeasonData): string {
     const msg = this.buildHTML([
       { type: TYPE_TITLE, value: 'NUEVA TEMPORADA' },
       { type: TYPE_NEW_LINE },
       { type: 'name', value: data.name },
-      { type: 'overview', value: data.overview },
       { type: TYPE_NEW_LINE },
+      { type: 'overview', value: data.overview },
       {
         type: 'seasons',
-        value: `Temporadas: ${data.seasons} | Capitulos: ${data.chapters}`,
+        value: `Temporada: ${data.season} | Capitulos: ${data.chapters}`,
       },
-      { type: 'status', value: this.getStatus(data.status) },
-      { type: 'year', value: data.years },
-      { type: 'rating', value: data.rating },
-      { type: 'genres', value: data.genres },
-      { type: 'runtime', value: data.runtime },
+      { type: 'status', value: data.status },
+      { type: 'year', value: data.year },
+      { type: 'rating', value: data.rating.toString() },
+      { type: 'genres', value: data.genres.toString() },
       { type: TYPE_NEW_LINE },
-      // { type: 'providers', value: data.providers },
-      { type: TYPE_NEW_LINE },
-      // { type: 'trailer', value: data.trailer },
+      { type: 'trailer', value: data.trailer },
     ]);
 
     return msg;

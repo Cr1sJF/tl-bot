@@ -1,8 +1,8 @@
-import { IMediaData, IMediaDataConstructor } from '../types';
+import { IMediaData } from '../types';
 
 const formatTime = (min: number) => {
   if (isNaN(min) || min < 0) {
-    return 'Tiempo inválido';
+    return undefined;
   }
 
   const hours = Math.floor(min / 60);
@@ -22,13 +22,14 @@ export default class Media implements IMediaData {
   rating: string;
   trailer?: string;
 
-  constructor(data: IMediaDataConstructor) {
+  constructor(data: IMediaData) {
     this.id = data.id;
     this.name = data.name;
     this.overview = data.overview;
     this.tagline = data.tagline;
     this.posterUrl = data.posterUrl;
-    this.genres = data.genres.join(' | ');
+    this.genres =
+      typeof data.genres === 'string' ? data.genres : data.genres.join(' | ');
     this.runtime = formatTime(Number(data.runtime));
     this.rating = Number(data.rating).toFixed(2);
 

@@ -34,21 +34,9 @@ export interface IMediaData {
   overview: string;
   tagline: string;
   posterUrl: string;
-  genres: string;
-  runtime?: string;
-  rating: string;
-  trailer?: string;
-}
-
-export interface IMediaDataConstructor {
-  id: number;
-  name: string;
-  overview: string;
-  tagline: string;
-  posterUrl: string;
-  genres: string[];
-  runtime?: number;
-  rating: number;
+  genres: string | string[];
+  rating: string | number;
+  runtime?: string | number;
   trailer?: string;
 }
 
@@ -56,15 +44,20 @@ export interface IMovieData extends IMediaData {
   year: string;
 }
 
-export interface IMovieDataConstructor extends IMediaDataConstructor {
-  year: string;
-}
-
 export interface IShowData extends IMediaData {
   years: string;
+  from: string;
+  to: string;
   chapters: number;
   seasons: number;
   status: string;
 }
 
-export type AnyMediaData = IMediaData | IMovieData | IShowData;
+export interface ISeasonData extends IMediaData {
+  season: number;
+  chapters: number;
+  year: string;
+  status: string;
+}
+
+export type AnyMediaData = IMediaData | IMovieData | IShowData | ISeasonData;

@@ -72,9 +72,9 @@ export interface TmdbMovieResponse extends TmdbResponseBase {
   vote_count: number;
 }
 
-export  interface TmdbVideoResponse {
+export interface TmdbVideoResponse {
   id: number;
-  results: VideoInfo[]
+  results: VideoInfo[];
 }
 
 export interface TmdbShowResponse extends TmdbResponseBase {
@@ -90,21 +90,7 @@ export interface TmdbShowResponse extends TmdbResponseBase {
   in_production: boolean;
   languages: string[];
   last_air_date: string;
-  last_episode_to_air: {
-    id: number;
-    name: string;
-    overview: string;
-    vote_average: number;
-    vote_count: number;
-    air_date: string;
-    episode_number: number;
-    episode_type: string;
-    production_code: string;
-    runtime: number;
-    season_number: number;
-    show_id: number;
-    still_path: string;
-  };
+  last_episode_to_air: Episode;
   name: string;
   next_episode_to_air: null | any;
   networks: {
@@ -132,6 +118,66 @@ export interface TmdbShowResponse extends TmdbResponseBase {
   vote_count: number;
 }
 
+export interface TmdbSeasonResponse {
+  _id: string;
+  air_date: string;
+  episodes: Episode[];
+  name: string;
+  overview: string;
+  id: number;
+  poster_path: string;
+  season_number: number;
+  vote_average: number;
+  videos: {
+    results: VideoInfo[];
+  }
+}
+
+export interface Episode {
+  air_date: string;
+  episode_number: number;
+  episode_type: string;
+  id: number;
+  name: string;
+  overview: string;
+  production_code: string;
+  runtime: number;
+  season_number: number;
+  show_id: number;
+  still_path: string;
+  vote_average: number;
+  vote_count: number;
+  crew: Crew[];
+  guest_stars: Crew[];
+}
+
+export interface Crew {
+  job?: string;
+  department?: Department;
+  credit_id: string;
+  adult: boolean;
+  gender: number;
+  id: number;
+  known_for_department: Department;
+  name: string;
+  original_name: string;
+  popularity: number;
+  profile_path: null | string;
+  character?: string;
+  order?: number;
+}
+
+export enum Department {
+  Acting = 'Acting',
+  Camera = 'Camera',
+  Crew = 'Crew',
+  Directing = 'Directing',
+  Editing = 'Editing',
+  Production = 'Production',
+  Sound = 'Sound',
+  Writing = 'Writing',
+}
+
 export interface TmdbFindResponse<T> {
   page: number;
   results: T[];
@@ -139,4 +185,4 @@ export interface TmdbFindResponse<T> {
   total_results: number;
 }
 
-export type MediaType = 'movie' | 'tv';
+export type MediaType = 'movie' | 'tv' | 'season' | 'episode';

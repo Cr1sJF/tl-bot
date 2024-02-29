@@ -1,6 +1,9 @@
+import Log from '../models/Loggers/Logger';
 import { ApiResponse } from '../types';
 import { JellyfinResponse } from '../types/jellyfin';
 import ApiService from './Api';
+
+const log = new Log('JellyfinService');
 
 export default class JellyfinService extends ApiService {
   constructor() {
@@ -58,6 +61,19 @@ export default class JellyfinService extends ApiService {
       }
     } catch (error: any) {
       this.log.error('Error performing login', error);
+
+      return null;
+    }
+  }
+
+  public async getTmdbIdBySeason(id: string): Promise<string | null> {
+    try {
+      const itemResponse = await this.getItem<any>(id);
+      const show = await this.getItem<any>(itemResponse?.Items[0].SeriesId);
+
+      return show?.Items[0]?.ProviderIds?.Tmdb;
+    } catch (error: any) {
+      log.error('Error finding show by season id', error);
 
       return null;
     }
