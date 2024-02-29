@@ -182,7 +182,7 @@ export default class NotificationService {
         trailer: TMDB.getTrailer(tmdbSeason.videos.results),
         chapters: season.episode_count,
         season: season.season_number,
-        year: tmdbSeason.air_date.substring(0, 4),
+        year: tmdbSeason.air_date,
         episodes: tmdbSeason.episodes,
       });
 

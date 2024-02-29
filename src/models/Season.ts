@@ -7,11 +7,11 @@ export default class Season extends Media implements ISeasonData {
   chapters: number;
   year: string;
   status: string;
-  constructor(data: Omit<ISeasonData,"status"> & { episodes: Episode[] }) {
+  constructor(data: Omit<ISeasonData, 'status'> & { episodes: Episode[] }) {
     super(data);
     this.season = data.season;
     this.chapters = data.chapters;
-    this.year = data.year;
+    this.year = data.year.substring(0, 4);
     this.status = this.getStatus(data.episodes);
   }
 
