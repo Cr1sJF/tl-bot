@@ -2,12 +2,13 @@ import { Bot } from 'grammy';
 import BotProvider from './Bot';
 import Log from '../../models/Loggers/Logger';
 import { IMessageData } from '../../types';
-
+import setupBot from './TL';
 const log = new Log('TelegramBotProvider');
-const bot = new Bot(process.env.TL_BOT_ID!);
 
-export default class TelegramBotProvider extends BotProvider<Bot> {
-  getBot(): Bot {
+const bot = setupBot();
+
+export default class TelegramBotProvider extends BotProvider<typeof bot> {
+  getBot() {
     return bot;
   }
 

@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/Cr1sJF/tst#readme",
   "dependencies": {
+    "@grammyjs/conversations": "^1.2.0",
+    "@grammyjs/storage-psql": "^2.4.2",
+    "@grammyjs/storage-typeorm": "^2.4.2",
     "@types/express": "^4.17.21",
     "axios": "^1.6.7",
     "body-parser": "^1.20.2",
