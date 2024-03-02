@@ -3,7 +3,6 @@ import {
   StreamingAvailability,
   StreamingData,
   StreamingDescription,
-  StreamingInfo,
 } from '../types/Streaming';
 import ApiService from './Api';
 

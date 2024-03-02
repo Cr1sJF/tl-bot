@@ -3,15 +3,7 @@ import {
   type ConversationFlavor,
 } from '@grammyjs/conversations';
 import { Context, Keyboard } from 'grammy';
-import {
-  getMediaBatch,
-  getMediaTypeKeyboard,
-  getMediaWithConfirmation,
-  getYesNoKeyboard,
-  identifyMedia,
-} from '../utils';
-import SearchMedia from '../../../../models/SearchMedia';
-import TmbdService from '../../../../services/TMDB';
+import { getYesNoKeyboard, identifyMedia } from '../utils';
 
 const requestBuilder = async <T extends Context>(
   conversation: ConversationHandle<T>,

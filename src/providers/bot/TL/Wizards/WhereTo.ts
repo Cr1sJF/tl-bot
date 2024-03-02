@@ -4,8 +4,6 @@ import {
 } from '@grammyjs/conversations';
 import { Context, Keyboard } from 'grammy';
 import {
-  getMediaBatch,
-  getMediaWithConfirmation,
   identifyMedia,
 } from '../utils';
 import StreamingService from '../../../../services/Streaming';

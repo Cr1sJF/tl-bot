@@ -1,7 +1,7 @@
 import { Context, InlineKeyboard, Keyboard } from 'grammy';
 import Log from '../../../models/Loggers/Logger';
 import MessageService from '../../../services/Message';
-import { MediaType, TmdbSearchMediaResponse } from '../../../types/TMDB';
+import { TmdbSearchMediaResponse } from '../../../types/TMDB';
 import SearchMedia from '../../../models/SearchMedia';
 import TmbdService from '../../../services/TMDB';
 import {
@@ -57,8 +57,8 @@ export const getMediaTypeKeyboard = () => {
 };
 
 export const getYesNoKeyboard = () => {
-   return keyboard;
-}
+  return keyboard;
+};
 
 const validateType = (type: string) => {
   return type === 'SERIE' || type === 'PELICULA';
