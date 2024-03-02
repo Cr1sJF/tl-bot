@@ -1,19 +1,14 @@
 import {
-  type Conversation,
+  ConversationHandle,
   type ConversationFlavor,
-  conversations,
-  createConversation,
 } from '@grammyjs/conversations';
-import { CommandContext, Context } from 'grammy';
+import { Context } from 'grammy';
 import JellyfinService from '../../../../services/Jellyfin';
 
-type MyContext = Context & ConversationFlavor;
-type MyConversation = Conversation<MyContext>;
-
 const jellyFin = new JellyfinService();
-const loginBuilder = async (
-  conversation: Conversation<MyContext>,
-  ctx: CommandContext<MyContext>
+const loginBuilder = async <T extends Context>(
+  conversation: ConversationHandle<T>,
+  ctx: Context & ConversationFlavor
 ) => {
   await ctx.reply('Para loguearte, enviame primero tu usuario');
 
@@ -36,3 +31,5 @@ const loginBuilder = async (
     await ctx.reply('Login fallido');
   }
 };
+
+export default loginBuilder;

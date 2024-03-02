@@ -3,6 +3,7 @@ import {
   MediaType,
   TmdbFindResponse,
   TmdbMovieResponse,
+  TmdbSearchMediaResponse,
   TmdbSeasonResponse,
   TmdbShowResponse,
   VideoInfo,
@@ -96,8 +97,14 @@ export default class TmbdService extends ApiService {
     return this.get<TmdbShowResponse>(id, 'tv');
   }
 
-  public async getSeason(showId: string, seasonNumber: number): Promise<TmdbSeasonResponse | null> {
-    return this.get<TmdbSeasonResponse>([showId, seasonNumber.toString()], 'season');
+  public async getSeason(
+    showId: string,
+    seasonNumber: number
+  ): Promise<TmdbSeasonResponse | null> {
+    return this.get<TmdbSeasonResponse>(
+      [showId, seasonNumber.toString()],
+      'season'
+    );
   }
 
   public async searchMovie(
@@ -112,7 +119,38 @@ export default class TmbdService extends ApiService {
     return this.find<TmdbShowResponse>(term, 'tv');
   }
 
+  public async search(
+    query: string,
+    page: number = 1
+  ): Promise<TmdbSearchMediaResponse[] | null> {
+    try {
+      const response = await this.conector.get<ApiResponse<TmdbFindResponse>>(
+        '/search/multi',
+        {
+          params: {
+            query: query,
+            include_adult: false,
+            page: page,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        return response.data.data.results;
+      } else {
+        return null;
+      }
+    } catch (error: any) {
+      this.log.error('Error searching', error);
+      return null;
+    }
+  }
+
   public parseImage(path: string): string {
+    return IMG_URL + path;
+  }
+
+  public static parseImage(path: string): string {
     return IMG_URL + path;
   }
 

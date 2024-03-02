@@ -6,4 +6,8 @@ export default class BaseModel {
     const db = getInstance();
     return db.getRepository(this) as Repository<T>;
   }
+
+  static getClient() {
+    return getInstance();
+  }
 }

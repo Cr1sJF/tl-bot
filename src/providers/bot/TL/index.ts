@@ -1,10 +1,26 @@
-import { Bot, session } from 'grammy';
-import { MyContext, SessionData, getSessionKey } from './session';
-import { TypeormAdapter } from '@grammyjs/storage-typeorm';
-import { getRepository } from 'typeorm';
-import { Session } from '../../../models/DB/models/Session';
+import { Bot, Context, SessionFlavor, session } from 'grammy';
+import { SessionData, getSessionKey } from './session';
+import {
+  ConversationFlavor,
+  conversations,
+  createConversation,
+} from '@grammyjs/conversations';
+import loginBuilder from './Wizards/Login';
+import requestBuilder from './Wizards/Request';
+// import { PsqlAdapter } from '@grammyjs/storage-psql';
+// import { Session } from '../../../models/DB/models/Session';
 
-const setSession = (bot: Bot<MyContext>) => {
+export type MyContext = Context &
+  SessionFlavor<SessionData> &
+  ConversationFlavor;
+
+const setConversation = (bot: Bot<any>) => {
+  bot.use(conversations());
+  bot.use(createConversation(loginBuilder<MyContext>, 'login'));
+  bot.use(createConversation(requestBuilder<MyContext>, 'request'));
+};
+
+const setSession = async (bot: Bot<MyContext>) => {
   function initial(): SessionData {
     return { isLoggedIn: false };
   }
@@ -12,8 +28,14 @@ const setSession = (bot: Bot<MyContext>) => {
   bot.use(
     session({
       initial,
-      getSessionKey: getSessionKey,
-      storage: new TypeormAdapter({ repository: Session.getInstance<Session>() }),
+      // getSessionKey: getSessionKey,
+      // storage: await PsqlAdapter<SessionData>.create({
+      //   client: Session.getClient(),
+      //   tableName: 'session',
+      // }),
+      // storage: new TypeormAdapter({
+      //   repository: Session.getInstance<Session>(),
+      // }),
     })
   );
 };
@@ -23,12 +45,12 @@ const setCommands = (bot: Bot<MyContext>) => {
     ctx.reply('Hello!');
   });
 
-  bot.command('login', (ctx) => {
-    ctx.reply('Login');
+  bot.command('login', async (ctx) => {
+    await ctx.conversation.enter('login');
   });
 
-  bot.command('pedir', (ctx) => {
-    ctx.reply('Pedir');
+  bot.command('pedir', async (ctx) => {
+    await ctx.conversation.enter('request');
   });
 
   bot.command('problema', (ctx) => {
@@ -48,7 +70,7 @@ export default function setupBot() {
   const bot = new Bot<MyContext>(process.env.TL_BOT_ID!);
 
   setSession(bot);
-
+  setConversation(bot);
   setCommands(bot);
 
   bot.start();

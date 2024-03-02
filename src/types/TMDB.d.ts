@@ -130,7 +130,7 @@ export interface TmdbSeasonResponse {
   vote_average: number;
   videos: {
     results: VideoInfo[];
-  }
+  };
 }
 
 export interface Episode {
@@ -178,11 +178,34 @@ export enum Department {
   Writing = 'Writing',
 }
 
-export interface TmdbFindResponse<T> {
+export interface TmdbFindResponse<T = TmdbSearchMediaResponse> {
   page: number;
   results: T[];
   total_pages: number;
   total_results: number;
+}
+
+export interface TmdbSearchMediaResponse
+  extends Pick<
+    TmdbResponseBase,
+    | 'adult'
+    | 'backdrop_path'
+    | 'id'
+    | 'original_language'
+    | 'overview'
+    | 'poster_path'
+    | 'popularity'
+    | 'vote_average'
+  > {
+  title: string;
+  original_title: string;
+  name?: string;
+  media_type: string;
+  genre_ids: number[];
+  release_date?: string;
+  first_air_date?: string;
+  video: boolean;
+  vote_count: number;
 }
 
 export type MediaType = 'movie' | 'tv' | 'season' | 'episode';

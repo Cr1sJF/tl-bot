@@ -1,3 +1,4 @@
+import SearchMedia from '../models/SearchMedia';
 import { IMovieData, ISeasonData, IShowData } from '../types';
 
 const TYPE_TITLE = 'TITLE';
@@ -125,6 +126,18 @@ export default class MessageService {
       { type: 'genres', value: data.genres.toString() },
       { type: TYPE_NEW_LINE },
       { type: 'trailer', value: data.trailer },
+    ]);
+
+    return msg;
+  }
+
+  getSearchMessage(data: SearchMedia): string {
+    const msg = this.buildHTML([
+      { type: 'name', value: data.original_title },
+      { type: TYPE_NEW_LINE },
+      { type: 'overview', value: data.overview },
+      { type: 'year', value: data.release_date },
+      { type: 'rating', value: data.rating },
     ]);
 
     return msg;
