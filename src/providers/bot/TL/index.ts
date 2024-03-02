@@ -7,6 +7,7 @@ import {
 } from '@grammyjs/conversations';
 import loginBuilder from './Wizards/Login';
 import requestBuilder from './Wizards/Request';
+import whereToBuilder from './Wizards/WhereTo';
 // import { PsqlAdapter } from '@grammyjs/storage-psql';
 // import { Session } from '../../../models/DB/models/Session';
 
@@ -18,6 +19,7 @@ const setConversation = (bot: Bot<any>) => {
   bot.use(conversations());
   bot.use(createConversation(loginBuilder<MyContext>, 'login'));
   bot.use(createConversation(requestBuilder<MyContext>, 'request'));
+  bot.use(createConversation(whereToBuilder<MyContext>, 'whereTo'));
 };
 
 const setSession = async (bot: Bot<MyContext>) => {
@@ -57,8 +59,8 @@ const setCommands = (bot: Bot<MyContext>) => {
     ctx.reply('Problema');
   });
 
-  bot.command('donde', (ctx) => {
-    ctx.reply('Donde');
+  bot.command('donde', async (ctx) => {
+    await ctx.conversation.enter('whereTo');
   });
 
   bot.command('settings', (ctx) => {

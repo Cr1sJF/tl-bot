@@ -1,5 +1,6 @@
 import SearchMedia from '../models/SearchMedia';
 import { IMovieData, ISeasonData, IShowData } from '../types';
+import { StreamingAvailability } from '../types/Streaming';
 
 const TYPE_TITLE = 'TITLE';
 const TYPE_NEW_LINE = 'NEW_LINE';
@@ -141,5 +142,15 @@ export default class MessageService {
     ]);
 
     return msg;
+  }
+
+  getStreamingMessage(data: StreamingAvailability[]): string {
+    const msg = data
+      .map((i) => {
+        return `-> <a href="${i.link}">${i.streamingPlatform}</a>`;
+      })
+      .join('\n');
+
+      return msg;
   }
 }
