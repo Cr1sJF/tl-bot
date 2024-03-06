@@ -4,20 +4,14 @@ import MessageService from '../../../services/Message';
 import { TmdbSearchMediaResponse } from '../../../types/TMDB';
 import SearchMedia from '../../../models/SearchMedia';
 import TmbdService from '../../../services/TMDB';
-import {
-  ConversationFlavor,
-  ConversationHandle,
-} from '@grammyjs/conversations';
 import { ConversationContext, MyContext } from '.';
 import User from '../../../models/DB/models/User';
 
 const log = new Log('TL_Utils');
 const messageService = new MessageService();
 const tmbdService = new TmbdService();
-const keyboard = new Keyboard()
-  .text('✅ Si')
-  .text('❌ No')
-  .oneTime();
+
+const keyboard = new Keyboard().text('✅ Si').text('❌ No').oneTime();
 
 const MAP_TYPES = {
   PELICULA: 'movie',
@@ -25,8 +19,18 @@ const MAP_TYPES = {
   TEMPORADA: 'season',
 };
 
-export const getMediaWithConfirmation = (media: SearchMedia) => {
-  let msg: string = messageService.getSearchMessage(media);
+export interface IdentifiedMedia {
+  mediaId: string;
+  type: string;
+  founded: boolean;
+  name: string;
+}
+
+export const getMediaWithConfirmation = (
+  media: SearchMedia,
+  includeType: boolean
+) => {
+  let msg: string = messageService.getSearchMessage(media, includeType);
 
   return {
     text: msg,
@@ -37,11 +41,17 @@ export const getMediaWithConfirmation = (media: SearchMedia) => {
 export const getMediaBatch = async (
   query: string,
   page: number,
-  type: keyof typeof MAP_TYPES
+  type?: keyof typeof MAP_TYPES
 ): Promise<TmdbSearchMediaResponse[]> => {
   const result = await tmbdService.search(query, page);
 
-  return result?.filter((media) => media.media_type === MAP_TYPES[type]) || [];
+  if (type) {
+    return (
+      result?.filter((media) => media.media_type === type) || []
+    );
+  } else {
+    return result || [];
+  }
 };
 
 export const getMediaTypeKeyboard = () => {
@@ -65,10 +75,27 @@ const validateType = (type: string) => {
   return type === 'SERIE' || type === 'PELICULA';
 };
 
+export const getTypeAndQuery = (match: string) => {
+  let type: string = '',
+    query: string = '';
+  if (match.toUpperCase().indexOf('SERIE') > -1) {
+    type = MAP_TYPES.SERIE;
+    query = match.toUpperCase().replace('SERIE', '');
+  } else if (match.toUpperCase().indexOf('PELICULA') > -1) {
+    type = MAP_TYPES.PELICULA;
+    query = match.toUpperCase().replace('PELICULA', '');
+  } else {
+    query = match;
+  }
+
+  return { type, query };
+};
+
 const askIfMedia = async (
   ctx: MyContext,
   conversation: ConversationContext,
-  media: TmdbSearchMediaResponse
+  media: TmdbSearchMediaResponse,
+  type?: string
 ): Promise<boolean> => {
   const { text, keyboard } = getMediaWithConfirmation(
     new SearchMedia({
@@ -83,7 +110,8 @@ const askIfMedia = async (
       title: media.title,
       name: media.name,
       vote_average: media.vote_average,
-    })
+    }),
+    type ? false : true
   );
 
   await ctx.replyWithPhoto(TmbdService.parseImage(media.poster_path), {
@@ -114,23 +142,13 @@ const getMediaType = async (
   return ctx.message?.text || '';
 };
 
-export const identifyMedia = async (
+const identify = async (
+  ctx: MyContext,
   conversation: ConversationContext,
-  ctx: MyContext
-): Promise<{
-  mediaId: string;
-  type: string;
-  founded: boolean;
-  name: string;
-}> => {
+  query: string,
+  type: string
+): Promise<IdentifiedMedia> => {
   try {
-    const type = await getMediaType(ctx, conversation);
-
-    await ctx.reply(`Dime el nombre de la ${type.toLocaleLowerCase()}`);
-
-    ctx = await conversation.waitFor(':text');
-    let query = ctx.message?.text || '';
-
     await ctx.reply(`Ok, voy a buscar ${query}...`);
 
     let page = 1;
@@ -155,7 +173,7 @@ export const identifyMedia = async (
     let index = 0;
     while (!found && results.length) {
       mediaId = results[index].id.toString();
-      found = await askIfMedia(ctx, conversation, results[index]);
+      found = await askIfMedia(ctx, conversation, results[index], type);
       if (!found) index++;
 
       if (index >= results.length) {
@@ -173,6 +191,40 @@ export const identifyMedia = async (
       type,
       name: results[index].name || results[index].title,
     };
+  } catch (error) {
+    return {
+      founded: false,
+      mediaId: '',
+      type: '',
+      name: '',
+    };
+  }
+};
+
+export const identifyMediaExpress = async (
+  ctx: MyContext,
+  conversation: ConversationContext,
+  type: string,
+  query: string
+): Promise<IdentifiedMedia> => {
+  const result = await identify(ctx, conversation, query, type);
+  return result;
+};
+
+export const identifyMedia = async (
+  conversation: ConversationContext,
+  ctx: MyContext
+): Promise<IdentifiedMedia> => {
+  try {
+    const type = await getMediaType(ctx, conversation);
+
+    await ctx.reply(`Dime el nombre de la ${type.toLocaleLowerCase()}`);
+
+    ctx = await conversation.waitFor(':text');
+    let query = ctx.message?.text || '';
+
+    const result = await identify(ctx, conversation, query, type);
+    return result;
   } catch (error: any) {
     log.error('Error identifying media', error);
 

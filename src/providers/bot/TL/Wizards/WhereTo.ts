@@ -1,5 +1,5 @@
 import { Keyboard } from 'grammy';
-import { identifyMedia } from '../utils';
+import { getTypeAndQuery, identifyMedia, identifyMediaExpress } from '../utils';
 import StreamingService from '../../../../services/Streaming';
 import { StreamingAvailability } from '../../../../types/Streaming';
 import MessageService from '../../../../services/Message';
@@ -9,7 +9,13 @@ const whereToBuilder = async (
   conversation: ConversationContext,
   ctx: MyContext
 ) => {
-  const mediaData = await identifyMedia(conversation, ctx);
+  let mediaData;
+  if (ctx.match) {
+    const { type, query } = getTypeAndQuery(ctx.match as string);
+    mediaData = await identifyMediaExpress(ctx, conversation, type, query);
+  } else {
+    mediaData = await identifyMedia(conversation, ctx);
+  }
 
   if (!mediaData) {
     await ctx.reply(
@@ -27,7 +33,7 @@ const whereToBuilder = async (
     const streamingService = new StreamingService();
     const streamingData: StreamingAvailability[] = await streamingService.get(
       mediaData.mediaId,
-      mediaData.type == 'SERIE' ? 'tv' : 'movie',
+      mediaData.type as 'tv' | 'movie',
       country?.toLocaleLowerCase() as 'ar' | 'cl'
     );
 

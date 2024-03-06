@@ -21,6 +21,7 @@ const typeToEmoji: Record<string, string> = {
   providers: '🍿',
   trailer: '🎬',
   status: 'ℹ️',
+  type: '🎞️',
 };
 
 export default class MessageService {
@@ -132,10 +133,13 @@ export default class MessageService {
     return msg;
   }
 
-  getSearchMessage(data: SearchMedia): string {
+  getSearchMessage(data: SearchMedia, includeType: boolean): string {
     const msg = this.buildHTML([
       { type: 'name', value: `<b>${data.title || data.original_title}</b>` },
       { type: TYPE_NEW_LINE },
+      includeType
+        ? { type: 'type', value: includeType ? data.media_type == 'movie' ? 'Pelicula' : 'Serie' : '' }
+        : { type: TYPE_NEW_LINE },
       { type: 'overview', value: data.overview },
       { type: 'year', value: data.release_date },
       { type: 'rating', value: data.rating },

@@ -40,6 +40,10 @@ export default class StreamingService extends ApiService {
         return [];
       }
 
+      if (!result.data.data.result.streamingInfo[country]) {
+        return [];
+      }
+
       return result.data.data.result.streamingInfo[country]
         .filter(
           (element: StreamingDescription) =>
