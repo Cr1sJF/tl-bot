@@ -134,7 +134,7 @@ export default class MessageService {
 
   getSearchMessage(data: SearchMedia): string {
     const msg = this.buildHTML([
-      { type: 'name', value: data.original_title },
+      { type: 'name', value: `<b>${data.title || data.original_title}</b>` },
       { type: TYPE_NEW_LINE },
       { type: 'overview', value: data.overview },
       { type: 'year', value: data.release_date },
@@ -151,6 +151,6 @@ export default class MessageService {
       })
       .join('\n');
 
-      return msg;
+    return msg;
   }
 }

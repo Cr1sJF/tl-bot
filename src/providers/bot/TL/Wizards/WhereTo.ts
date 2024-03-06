@@ -1,18 +1,13 @@
-import {
-  ConversationHandle,
-  type ConversationFlavor,
-} from '@grammyjs/conversations';
-import { Context, Keyboard } from 'grammy';
-import {
-  identifyMedia,
-} from '../utils';
+import { Keyboard } from 'grammy';
+import { identifyMedia } from '../utils';
 import StreamingService from '../../../../services/Streaming';
 import { StreamingAvailability } from '../../../../types/Streaming';
 import MessageService from '../../../../services/Message';
+import { ConversationContext, MyContext } from '..';
 
-const whereToBuilder = async <T extends Context>(
-  conversation: ConversationHandle<T>,
-  ctx: Context & ConversationFlavor
+const whereToBuilder = async (
+  conversation: ConversationContext,
+  ctx: MyContext
 ) => {
   const mediaData = await identifyMedia(conversation, ctx);
 

@@ -3,7 +3,7 @@ import { ISession } from '@grammyjs/storage-typeorm';
 import BaseModel from './BaseModel';
 
 @Entity('session')
-export class Session extends BaseModel implements ISession {
+export default class Session extends BaseModel implements ISession {
   @PrimaryGeneratedColumn()
   id!: string;
 

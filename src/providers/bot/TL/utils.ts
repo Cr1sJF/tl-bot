@@ -8,6 +8,8 @@ import {
   ConversationFlavor,
   ConversationHandle,
 } from '@grammyjs/conversations';
+import { ConversationContext, MyContext } from '.';
+import User from '../../../models/DB/models/User';
 
 const log = new Log('TL_Utils');
 const messageService = new MessageService();
@@ -64,93 +66,161 @@ const validateType = (type: string) => {
   return type === 'SERIE' || type === 'PELICULA';
 };
 
-export const identifyMedia = async <T extends Context>(
-  conversation: ConversationHandle<T>,
-  ctx: Context & ConversationFlavor
-): Promise<{ mediaId: string; type: string } | null> => {
+const askIfMedia = async (
+  ctx: MyContext,
+  conversation: ConversationContext,
+  media: TmdbSearchMediaResponse
+): Promise<boolean> => {
+  const { text, keyboard } = getMediaWithConfirmation(
+    new SearchMedia({
+      backdrop_path: media.backdrop_path,
+      id: media.id,
+      media_type: media.media_type,
+      overview: media.overview,
+      original_title: media.original_title,
+      poster_path: media.poster_path,
+      release_date: media.release_date,
+      first_air_date: media.first_air_date,
+      title: media.title,
+      name: media.name,
+      vote_average: media.vote_average,
+    })
+  );
+
+  await ctx.replyWithPhoto(TmbdService.parseImage(media.poster_path), {
+    caption: text,
+    reply_markup: keyboard,
+    parse_mode: 'HTML',
+  });
+
+  ctx = await conversation.waitFor(':text');
+
+  if (ctx.message!.text === '✅ Si') {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const getMediaType = async (
+  ctx: MyContext,
+  conversation: ConversationContext
+): Promise<string> => {
+  await ctx.reply('Selecciona un tipo', {
+    reply_markup: getMediaTypeKeyboard(),
+  });
+
+  ctx = await conversation.waitFor(':text');
+
+  return ctx.message?.text || '';
+};
+
+export const identifyMedia = async (
+  conversation: ConversationContext,
+  ctx: MyContext
+): Promise<{
+  mediaId: string;
+  type: string;
+  founded: boolean;
+  name: string;
+}> => {
   try {
-    let type = '';
+    const type = await getMediaType(ctx, conversation);
 
-    while (!validateType(type)) {
-      await ctx.reply('Selecciona un tipo', {
-        reply_markup: getMediaTypeKeyboard(),
-      });
+    await ctx.reply(`Dime el nombre de la ${type.toLocaleLowerCase()}`);
 
-      const typeResponse = await conversation.waitFor(':text');
-      type = typeResponse.message?.text || '';
+    ctx = await conversation.waitFor(':text');
+    let query = ctx.message?.text || '';
 
-      if (!validateType(type)) {
-        await ctx.reply('Por favor, selecciona una opción válida', {
-          reply_markup: getMediaTypeKeyboard(),
-        });
-      }
-    }
-
-    let query = '';
-    while (!query) {
-      await ctx.reply(`Dime el nombre de la ${type.toLocaleLowerCase()}`);
-
-      const queryResponse = await conversation.waitFor(':text');
-      query = queryResponse.message?.text || '';
-    }
-
-    await ctx.reply(`Ok, voy a buscar la ${type} ${query}...`);
+    await ctx.reply(`Ok, voy a buscar ${query}...`);
 
     let page = 1;
-    let results = await getMediaBatch(query, page, type as any);
+    let results = await conversation.external(async () =>
+      getMediaBatch(query, page, type as any)
+    );
 
     if (!results || !results.length) {
-      await ctx.reply(`No se han encontrado resultados para ${query}`);
-      return null;
+      await ctx.reply(
+        `No se han encontrado resultados para ${query}. Por favor, inicia el proceso nuevamente`
+      );
+      return {
+        mediaId: '',
+        type,
+        founded: false,
+        name: '',
+      };
     }
 
     let found = false;
     let mediaId: string = '';
 
-    while (!found && results.length) {
-      const media = results.shift()!;
-      mediaId = media.id.toString();
+    let index = 0;
+    while (!found) {
+      mediaId = results[index].id.toString();
+      found = await askIfMedia(ctx, conversation, results[index]);
+      if (!found) index++;
 
-      const { text, keyboard } = getMediaWithConfirmation(
-        new SearchMedia({
-          backdrop_path: media.backdrop_path,
-          id: media.id,
-          media_type: media.media_type,
-          overview: media.overview,
-          original_title: media.original_title,
-          poster_path: media.poster_path,
-          release_date: media.release_date,
-          first_air_date: media.first_air_date,
-          title: media.title,
-          name: media.name,
-          vote_average: media.vote_average,
-        })
-      );
-
-      if (!results.length) {
-        results = await getMediaBatch(query, ++page, type as any);
-      }
-
-      await ctx.replyWithPhoto(TmbdService.parseImage(media.poster_path), {
-        caption: text,
-        reply_markup: keyboard,
-        parse_mode: 'HTML',
-      });
-
-      const response = await conversation.waitFor(':text');
-
-      if (response.message!.text === '✅ Si') {
-        found = true;
+      if (index >= results.length) {
+        index = 0;
+        page++;
+        results = await conversation.external(async () =>
+          getMediaBatch(query, page, type as any)
+        );
       }
     }
 
     return {
+      founded: found,
       mediaId,
       type,
+      name: results[index].name || results[index].title,
     };
   } catch (error: any) {
     log.error('Error identifying media', error);
 
-    return null;
+    return {
+      mediaId: '',
+      type: '',
+      founded: false,
+      name: '',
+    };
+  }
+};
+
+export const validateLogin = async (ctx: MyContext): Promise<boolean> => {
+  try {
+    const sessionLogin = ctx.session.isLoggedIn;
+
+    if (sessionLogin) {
+      return true;
+    } else {
+      const loginDb = await User.validateLogin(ctx.chat?.id);
+      if (!loginDb) {
+        await ctx.reply(
+          'Esta funcionalidad requiere estar logueado. Utiliza el comando /login'
+        );
+        return false;
+      }
+
+      ctx.session.isLoggedIn = true;
+      return true;
+    }
+  } catch (error: any) {
+    log.error('Error validating login', error);
+    return false;
+  }
+};
+
+export const logout = async (ctx: MyContext) => {
+  try {
+    ctx.session.isLoggedIn = false;
+    await User.getInstance().delete({
+      chatId: ctx.chat?.id,
+    });
+
+    await ctx.reply('Sesión cerrada');
+  } catch (error: any) {
+    ctx.reply('Ocurrio un error al cerrar la sesión');
+    log.error('Error logging out', error);
   }
 };

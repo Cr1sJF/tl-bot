@@ -12,7 +12,7 @@ export default class TelegramBotProvider extends BotProvider<typeof bot> {
     return bot;
   }
 
-  async send(message: IMessageData, chatId: string): Promise<boolean> {
+  async send(message: IMessageData, chatId: number): Promise<boolean> {
     try {
       if (message.image) {
         await bot.api.sendPhoto(chatId, message.image, {

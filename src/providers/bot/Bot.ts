@@ -8,7 +8,7 @@ export default abstract class BotProvider<T> {
     abstract report(): Promise<boolean>;
     abstract whereToWatch(): Promise<boolean>;
 
-    abstract send(message: IMessageData, chatId: string): Promise<boolean>;
+    abstract send(message: IMessageData, chatId: number): Promise<boolean>;
 
     // abstract settings(): Promise<boolean>;
 }

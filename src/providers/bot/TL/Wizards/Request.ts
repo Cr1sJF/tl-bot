@@ -1,25 +1,24 @@
-import {
-  ConversationHandle,
-  type ConversationFlavor,
-} from '@grammyjs/conversations';
-import { Context, Keyboard } from 'grammy';
 import { getYesNoKeyboard, identifyMedia } from '../utils';
+import { ConversationContext, MyContext } from '..';
+import Request from '../../../../models/DB/models/Request';
+// import Request from '../../../../models/DB/models/Request';
 
-const requestBuilder = async <T extends Context>(
-  conversation: ConversationHandle<T>,
-  ctx: Context & ConversationFlavor
+const requestBuilder = async (
+  conversation: ConversationContext,
+  ctx: MyContext
 ) => {
   if (ctx.match) {
   } else {
     const media = await identifyMedia(conversation, ctx);
 
-    if (!media) {
+    if (!media.founded) {
       await ctx.reply(
         'No se ha podido identificar el tipo de contenido. Intenta nuevamente'
       );
       return;
     }
 
+    let season: number | undefined = undefined;
     if (media.type == 'SERIE') {
       await ctx.reply('¿Alguna temporada particular?', {
         reply_markup: getYesNoKeyboard(),
@@ -31,17 +30,26 @@ const requestBuilder = async <T extends Context>(
         await ctx.reply('¿Cuál? (enviame solamente el numero)');
 
         const response = await conversation.waitFor(':text');
-
-        if (response.message?.text) {
-          await ctx.reply(
-            `Listo! El pedido de la temporada ${response.message?.text} de tu serie quedo registrado`
-          );
-        }
-      } else {
-        await ctx.reply('Listo! El pedido de tu serie quedo registrado');
+        season = Number(response.message?.text);
       }
-    } else {
-      await ctx.reply('Listo! El pedido de tu pelicula quedo registrado');
+    }
+
+    try {
+      const status = await conversation.external(
+        async () =>
+          await Request.registerRequest(
+            Number(media.mediaId),
+            media.type,
+            ctx.chat!.id,
+            season
+          )
+      );
+
+      await ctx.reply(
+        'Listo! El pedido de tu serie quedo registrado con numero ' + status?.id
+      );
+    } catch (error) {
+      await ctx.reply('Lo siento, se produjo un error al registrar el pedido');
     }
   }
 };

@@ -1,6 +1,7 @@
 import { Bot, Context, SessionFlavor, session } from 'grammy';
 import { SessionData, getSessionKey } from './session';
 import {
+  Conversation,
   ConversationFlavor,
   conversations,
   createConversation,
@@ -8,18 +9,21 @@ import {
 import loginBuilder from './Wizards/Login';
 import requestBuilder from './Wizards/Request';
 import whereToBuilder from './Wizards/WhereTo';
-// import { PsqlAdapter } from '@grammyjs/storage-psql';
-// import { Session } from '../../../models/DB/models/Session';
+import Session from '../../../models/DB/models/Session';
+import { TypeormAdapter } from '@grammyjs/storage-typeorm';
+import { logout, validateLogin } from './utils';
 
 export type MyContext = Context &
   SessionFlavor<SessionData> &
   ConversationFlavor;
 
+export type ConversationContext = Conversation<MyContext>;
+
 const setConversation = (bot: Bot<any>) => {
   bot.use(conversations());
-  bot.use(createConversation(loginBuilder<MyContext>, 'login'));
-  bot.use(createConversation(requestBuilder<MyContext>, 'request'));
-  bot.use(createConversation(whereToBuilder<MyContext>, 'whereTo'));
+  bot.use(createConversation(loginBuilder, 'login'));
+  bot.use(createConversation(requestBuilder, 'request'));
+  bot.use(createConversation(whereToBuilder, 'whereTo'));
 };
 
 const setSession = async (bot: Bot<MyContext>) => {
@@ -27,17 +31,17 @@ const setSession = async (bot: Bot<MyContext>) => {
     return { isLoggedIn: false };
   }
 
+  const repo = Session.getInstance<Session>();
+
+  const adapter = new TypeormAdapter<SessionData>({
+    repository: repo,
+  });
+
   bot.use(
     session({
       initial,
-      // getSessionKey: getSessionKey,
-      // storage: await PsqlAdapter<SessionData>.create({
-      //   client: Session.getClient(),
-      //   tableName: 'session',
-      // }),
-      // storage: new TypeormAdapter({
-      //   repository: Session.getInstance<Session>(),
-      // }),
+      storage: adapter,
+      getSessionKey,
     })
   );
 };
@@ -48,23 +52,40 @@ const setCommands = (bot: Bot<MyContext>) => {
   });
 
   bot.command('login', async (ctx) => {
-    await ctx.conversation.enter('login');
+    if (ctx.session.isLoggedIn) {
+      await ctx.reply('Ya estas logueado :)');
+    } else {
+      await ctx.conversation.enter('login');
+    }
+  });
+
+  bot.command('logout', async (ctx) => {
+    if (ctx.session.isLoggedIn) {
+      await logout(ctx);
+    } else {
+      await ctx.reply('No estas logueado');
+    }
   });
 
   bot.command('pedir', async (ctx) => {
-    await ctx.conversation.enter('request');
+    const loggedIn = await validateLogin(ctx);
+
+    if (loggedIn) await ctx.conversation.enter('request');
   });
 
-  bot.command('problema', (ctx) => {
-    ctx.reply('Problema');
+  bot.command('error', async (ctx) => {
+    const loggedIn = await validateLogin(ctx);
+    if (loggedIn) await ctx.reply('OK');
   });
 
-  bot.command('donde', async (ctx) => {
+  bot.command('dondeveo', async (ctx) => {
     await ctx.conversation.enter('whereTo');
   });
 
-  bot.command('settings', (ctx) => {
-    ctx.reply('Settings');
+  bot.command('config', async (ctx) => {
+    const loggedIn = await validateLogin(ctx);
+
+    if (loggedIn) ctx.reply('Settings');
   });
 };
 

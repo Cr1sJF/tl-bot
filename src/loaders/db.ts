@@ -32,6 +32,7 @@ const init = async () => {
       logging: process.env.DB_LOGGING === 'true' ? true : false,
     });
     await db.initialize();
+
     console.log('Database connected');
 
     DB_INSTANCE = db;
