@@ -17,8 +17,7 @@ const tmbdService = new TmbdService();
 const keyboard = new Keyboard()
   .text('✅ Si')
   .text('❌ No')
-  .oneTime()
-  .persistent();
+  .oneTime();
 
 const MAP_TYPES = {
   PELICULA: 'movie',
@@ -150,12 +149,11 @@ export const identifyMedia = async (
         name: '',
       };
     }
-
     let found = false;
     let mediaId: string = '';
 
     let index = 0;
-    while (!found) {
+    while (!found && results.length) {
       mediaId = results[index].id.toString();
       found = await askIfMedia(ctx, conversation, results[index]);
       if (!found) index++;
