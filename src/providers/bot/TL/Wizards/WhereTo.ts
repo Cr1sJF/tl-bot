@@ -45,7 +45,7 @@ const whereToBuilder = async (
     }
 
     const messageService = new MessageService();
-    const msg = messageService.getStreamingMessage(streamingData);
+    const msg = messageService.getStreamingMessage(streamingData, mediaData.name);
 
     await ctx.reply(msg, {
       parse_mode: 'HTML',

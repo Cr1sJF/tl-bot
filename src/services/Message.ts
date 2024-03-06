@@ -138,7 +138,14 @@ export default class MessageService {
       { type: 'name', value: `<b>${data.title || data.original_title}</b>` },
       { type: TYPE_NEW_LINE },
       includeType
-        ? { type: 'type', value: includeType ? data.media_type == 'movie' ? 'Pelicula' : 'Serie' : '' }
+        ? {
+            type: 'type',
+            value: includeType
+              ? data.media_type == 'movie'
+                ? 'Pelicula'
+                : 'Serie'
+              : '',
+          }
         : { type: TYPE_NEW_LINE },
       { type: 'overview', value: data.overview },
       { type: 'year', value: data.release_date },
@@ -148,12 +155,12 @@ export default class MessageService {
     return msg;
   }
 
-  getStreamingMessage(data: StreamingAvailability[]): string {
-    const msg = data
+  getStreamingMessage(data: StreamingAvailability[], name: string): string {
+    const msg = `Puedes ver ${name} en: \n ${data
       .map((i) => {
-        return `-> <a href="${i.link}">${i.streamingPlatform}</a>`;
+        return `➡️ <a href="${i.link}">${i.streamingPlatform}</a>`;
       })
-      .join('\n');
+      .join('\n')}`;
 
     return msg;
   }
