@@ -12,6 +12,7 @@ import whereToBuilder from './Wizards/WhereTo';
 import Session from '../../../models/DB/models/Session';
 import { TypeormAdapter } from '@grammyjs/storage-typeorm';
 import { logout, validateLogin } from './utils';
+import errorBuilder from './Wizards/Errors';
 
 export type MyContext = Context &
   SessionFlavor<SessionData> &
@@ -24,6 +25,7 @@ const setConversation = (bot: Bot<any>) => {
   bot.use(createConversation(loginBuilder, 'login'));
   bot.use(createConversation(requestBuilder, 'request'));
   bot.use(createConversation(whereToBuilder, 'whereTo'));
+  bot.use(createConversation(errorBuilder, 'error'));
 };
 
 const setSession = async (bot: Bot<MyContext>) => {
@@ -75,7 +77,7 @@ const setCommands = (bot: Bot<MyContext>) => {
 
   bot.command('error', async (ctx) => {
     const loggedIn = await validateLogin(ctx);
-    if (loggedIn) await ctx.reply('OK');
+    if (loggedIn) await ctx.conversation.enter('error');
   });
 
   bot.command('dondeveo', async (ctx) => {
