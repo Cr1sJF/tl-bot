@@ -46,9 +46,7 @@ export const getMediaBatch = async (
   const result = await tmbdService.search(query, page);
 
   if (type) {
-    return (
-      result?.filter((media) => media.media_type === type) || []
-    );
+    return result?.filter((media) => media.media_type === type) || [];
   } else {
     return result || [];
   }
@@ -139,7 +137,7 @@ const getMediaType = async (
 
   ctx = await conversation.waitFor(':text');
 
-  return ctx.message?.text || '';
+  return ctx.message?.text == 'SERIE' ? 'tv' : 'movie';
 };
 
 const identify = async (
@@ -188,7 +186,7 @@ const identify = async (
     return {
       founded: found,
       mediaId,
-      type,
+      type: results[index].media_type,
       name: results[index].name || results[index].title,
     };
   } catch (error) {
