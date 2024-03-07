@@ -13,6 +13,7 @@ import Session from '../../../models/DB/models/Session';
 import { TypeormAdapter } from '@grammyjs/storage-typeorm';
 import { logout, validateLogin } from './utils';
 import errorBuilder from './Wizards/Errors';
+import settingsBuilder from './Wizards/Settings';
 
 export type MyContext = Context &
   SessionFlavor<SessionData> &
@@ -26,6 +27,7 @@ const setConversation = (bot: Bot<any>) => {
   bot.use(createConversation(requestBuilder, 'request'));
   bot.use(createConversation(whereToBuilder, 'whereTo'));
   bot.use(createConversation(errorBuilder, 'error'));
+  bot.use(createConversation(settingsBuilder, 'botConfig'));
 };
 
 const setSession = async (bot: Bot<MyContext>) => {
@@ -84,11 +86,17 @@ const setCommands = (bot: Bot<MyContext>) => {
     await ctx.conversation.enter('whereTo');
   });
 
-  bot.command('config', async (ctx) => {
+  bot.command("notificaciones", async (ctx) => {
     const loggedIn = await validateLogin(ctx);
-
-    if (loggedIn) ctx.reply('Settings');
+    if (loggedIn) await ctx.conversation.enter('botConfig');
   });
+
+//   bot.command('config', async (ctx) => {
+//     const loggedIn = await validateLogin(ctx);
+
+//     if (loggedIn) ctx.conversation.enter('login');
+//     // if (loggedIn) ctx.reply('En construccion...');
+//   });
 };
 
 export default function setupBot() {

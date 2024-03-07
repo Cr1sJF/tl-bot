@@ -31,12 +31,20 @@ export default class User extends BaseModel {
   @OneToMany(() => Report, (report) => report.user)
   reports!: Report[];
 
-  @ManyToMany(() => Request, request=> request.users)
-  @JoinTable({name: "user_requests_request", joinColumns: [{name: "userId"}], inverseJoinColumns: [{name: "requestId"}]})
+  @ManyToMany(() => Request, (request) => request.users)
+  @JoinTable({
+    name: 'user_requests_request',
+    joinColumns: [{ name: 'userId' }],
+    inverseJoinColumns: [{ name: 'requestId' }],
+  })
   requests!: Request[];
 
-  @ManyToMany(() => Notification)
-  @JoinTable()
+  @ManyToMany(() => Notification, (notification) => notification.users)
+  @JoinTable({
+    name: 'user_notifications_notifications',
+    joinColumns: [{ name: 'userId' }],
+    inverseJoinColumns: [{ name: 'notificationId' }],
+  })
   notifications!: Notification[];
 
   public async save(): Promise<User> {
@@ -103,6 +111,53 @@ export default class User extends BaseModel {
       return true;
     } catch (error: any) {
       User.log.db('Error saving request', error);
+      return false;
+    }
+  }
+
+  public static async saveNotification(user: User): Promise<boolean> {
+    try {
+      const repo = User.getInstance();
+
+      await repo.save(user);
+      return true;
+    } catch (error: any) {
+      User.log.db('Error saving notification', error);
+      return false;
+    }
+  }
+
+  public static async addNotification(
+    user: User,
+    notification: Notification
+  ): Promise<boolean> {
+    try {
+      const repo = User.getInstance();
+      user.notifications?.push(notification);
+      await repo.save(user);
+
+      return true;
+    } catch (error: any) {
+      User.log.db('Error adding notification', error);
+      return false;
+    }
+  }
+
+  public static async removeNotification(
+    user: User,
+    notification: Notification
+  ): Promise<boolean> {
+    try {
+      const repo = User.getInstance();
+      user.notifications = user.notifications?.filter(
+        (n) => n.id !== notification.id
+      );
+
+      await repo.save(user);
+
+      return true;
+    } catch (error: any) {
+      User.log.db('Error removing notification', error);
       return false;
     }
   }
