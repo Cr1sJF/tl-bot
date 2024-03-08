@@ -11,7 +11,7 @@ const log = new Log('TL_Utils');
 const messageService = new MessageService();
 const tmbdService = new TmbdService();
 
-const keyboard = new Keyboard().text('✅ Si').text('❌ No').oneTime();
+const keyboard = new Keyboard().text('✅ Si').text('❌ No').oneTime(true);
 
 const MAP_TYPES = {
   PELICULA: 'movie',
@@ -59,7 +59,7 @@ export const getMediaTypeKeyboard = () => {
     .text('PELICULA')
     .row()
     .persistent()
-    .oneTime()
+    .oneTime(true)
     .placeholder('Selecciona una opción');
 
   return keyboard;

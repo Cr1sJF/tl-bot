@@ -25,7 +25,7 @@ const loginBuilder = async (
   await ctx.reply('Estoy validando tus credenciales...');
 
   const loginStatus = await conversation.external(
-    async () => await jellyFin.login(user, password)
+    async () => await jellyFin.login(user.trim(), password.trim())
   );
 
   if (loginStatus) {

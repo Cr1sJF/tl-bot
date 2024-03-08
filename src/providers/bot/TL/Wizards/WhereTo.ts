@@ -23,7 +23,7 @@ const whereToBuilder = async (
     );
   } else {
     await ctx.reply('¿En que pais estas?', {
-      reply_markup: new Keyboard().text('AR').text('CL').persistent().oneTime(),
+      reply_markup: new Keyboard().text('AR').text('CL').oneTime(true),
     });
 
     const countryResponse = await conversation.waitFor(':text');
