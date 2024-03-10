@@ -156,9 +156,9 @@ export default class MessageService {
   }
 
   getStreamingMessage(data: StreamingAvailability[], name: string): string {
-    const msg = `Puedes ver ${name} en: \n ${data
+    const msg = `Puedes ver ${name} en: \n \n${data
       .map((i) => {
-        return `➡️ <a href="${i.link}">${i.streamingPlatform}</a>`;
+        return `➡️ <a href="${i.link}">${i.streamingPlatform}</a> \n`;
       })
       .join('\n')}`;
 
