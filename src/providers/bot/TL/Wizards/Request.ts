@@ -1,4 +1,5 @@
 import {
+  IMAGES,
   IdentifiedMedia,
   getTypeAndQuery,
   getYesNoKeyboard,
@@ -7,7 +8,6 @@ import {
 } from '../utils';
 import { ConversationContext, MyContext } from '..';
 import Request from '../../../../models/DB/models/Request';
-// import Request from '../../../../models/DB/models/Request';
 
 const requestBuilder = async (
   conversation: ConversationContext,
@@ -22,9 +22,10 @@ const requestBuilder = async (
   }
 
   if (!media.founded) {
-    await ctx.reply(
-      'No se ha podido identificar el tipo de contenido. Intenta nuevamente'
-    );
+    await ctx.replyWithAnimation(IMAGES.THINKING, {
+      caption:
+        'No se ha podido identificar el tipo de contenido. Intenta nuevamente',
+    });
     return;
   }
 
@@ -55,11 +56,15 @@ const requestBuilder = async (
         )
     );
 
-    await ctx.reply(
-      'Listo! El pedido de tu serie quedo registrado con numero ' + status?.id
-    );
+    await ctx.replyWithAnimation(IMAGES.OK, {
+      caption:
+        'Listo! El pedido de tu serie quedo registrado con numero ' +
+        status?.id,
+    });
   } catch (error) {
-    await ctx.reply('Lo siento, se produjo un error al registrar el pedido');
+    await ctx.replyWithAnimation(IMAGES.ERROR, {
+      caption: 'Lo siento, se produjo un error al registrar el pedido',
+    });
   }
 };
 

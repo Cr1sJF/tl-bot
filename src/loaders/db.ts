@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import fs from 'fs';
 import path from 'path';
+import User from '../models/DB/models/User';
 
 let DB_INSTANCE: DataSource;
 
@@ -29,7 +30,7 @@ const init = async () => {
       url: process.env.DB_URL,
       synchronize: false,
       entities: models,
-      logging: process.env.DB_LOGGING === 'true' ? true : false,
+      logging: true,
     });
     await db.initialize();
 

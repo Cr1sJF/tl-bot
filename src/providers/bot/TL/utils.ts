@@ -1,4 +1,4 @@
-import { Context, InlineKeyboard, Keyboard } from 'grammy';
+import { Context, InlineKeyboard, InputFile, Keyboard } from 'grammy';
 import Log from '../../../models/Loggers/Logger';
 import MessageService from '../../../services/Message';
 import { TmdbSearchMediaResponse } from '../../../types/TMDB';
@@ -6,6 +6,7 @@ import SearchMedia from '../../../models/SearchMedia';
 import TmbdService from '../../../services/TMDB';
 import { ConversationContext, MyContext } from '.';
 import User from '../../../models/DB/models/User';
+import path from 'path';
 
 const log = new Log('TL_Utils');
 const messageService = new MessageService();
@@ -266,9 +267,16 @@ export const logout = async (ctx: MyContext) => {
       chatId: ctx.chat?.id,
     });
 
-    await ctx.reply('Sesión cerrada');
+    await ctx.replyWithAnimation(IMAGES.HI, {caption:'Sesión cerrada. Vuelve pronto!'});
   } catch (error: any) {
     ctx.reply('Ocurrio un error al cerrar la sesión');
     log.error('Error logging out', error);
   }
+};
+
+export const IMAGES = {
+  HI: new InputFile(path.resolve(__dirname, './assets/saludo.mp4')),
+  OK: new InputFile(path.resolve(__dirname, './assets/ok.mp4')),
+  ERROR: new InputFile(path.resolve(__dirname, './assets/error.mp4')),
+  THINKING: new InputFile(path.resolve(__dirname, './assets/pensando.mp4')),
 };

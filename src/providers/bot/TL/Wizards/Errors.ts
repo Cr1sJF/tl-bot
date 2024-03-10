@@ -1,6 +1,7 @@
 import { Keyboard } from 'grammy';
 import { ConversationContext, MyContext } from '..';
 import Report from '../../../../models/DB/models/Report';
+import { IMAGES } from '../utils';
 
 const errorBuilder = async (
   conversation: ConversationContext,
@@ -27,19 +28,21 @@ const errorBuilder = async (
     );
 
     if (error) {
-      await ctx.reply(
-        `El error fue reportado con exito con numero ${error.id}. En cuanto se resuelva seras notificado`
-      );
+      await ctx.replyWithAnimation(IMAGES.OK, {
+        caption: `El error fue reportado con exito con numero ${error.id}. En cuanto se resuelva seras notificado`,
+      });
     } else {
-      await ctx.reply(
-        'Ocurrio un error reportando el error. Por favor, reporte un error jajaj'
-      );
+      await ctx.replyWithAnimation(IMAGES.ERROR, {
+        caption:
+          'Ocurrio un error reportando el error. Por favor, reporte un error jajaj',
+      });
     }
     return;
   } catch (error) {
-    await ctx.reply(
-      'Ocurrio un error reportando el error. Por favor, reporte un error jajaj'
-    );
+    await ctx.replyWithAnimation(IMAGES.ERROR, {
+      caption:
+        'Ocurrio un error reportando el error. Por favor, reporte un error jajaj',
+    });
     return;
   }
 };

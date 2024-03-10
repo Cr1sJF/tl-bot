@@ -1,5 +1,10 @@
 import { Keyboard } from 'grammy';
-import { getTypeAndQuery, identifyMedia, identifyMediaExpress } from '../utils';
+import {
+  IMAGES,
+  getTypeAndQuery,
+  identifyMedia,
+  identifyMediaExpress,
+} from '../utils';
 import StreamingService from '../../../../services/Streaming';
 import { StreamingAvailability } from '../../../../types/Streaming';
 import MessageService from '../../../../services/Message';
@@ -38,17 +43,21 @@ const whereToBuilder = async (
     );
 
     if (!streamingData || !streamingData.length) {
-      await ctx.reply(
-        `No encontré servicios de streaming que tengan la ${mediaData.type} disponible`
-      );
+      await ctx.replyWithAnimation(IMAGES.ERROR, {
+        caption: `No encontré servicios de streaming que tengan la ${mediaData.type} disponible`,
+      });
       return;
     }
 
     const messageService = new MessageService();
-    const msg = messageService.getStreamingMessage(streamingData, mediaData.name);
+    const msg = messageService.getStreamingMessage(
+      streamingData,
+      mediaData.name
+    );
 
-    await ctx.reply(msg, {
+    await ctx.replyWithAnimation(IMAGES.OK, {
       parse_mode: 'HTML',
+      caption: msg,
     });
   }
 };
