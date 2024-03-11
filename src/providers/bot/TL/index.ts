@@ -11,7 +11,7 @@ import requestBuilder from './Wizards/Request';
 import whereToBuilder from './Wizards/WhereTo';
 import Session from '../../../models/DB/models/Session';
 import { TypeormAdapter } from '@grammyjs/storage-typeorm';
-import { logout, validateLogin } from './utils';
+import { IMAGES, logout, validateLogin } from './utils';
 import errorBuilder from './Wizards/Errors';
 import settingsBuilder from './Wizards/Settings';
 
@@ -55,6 +55,24 @@ const setCommands = (bot: Bot<MyContext>) => {
     ctx.reply('Hello!');
   });
 
+  bot.command('help', async (ctx) => {
+    await ctx.replyWithAnimation(IMAGES.OK, {
+      caption: `
+      Utiliza los comandos para interactuar con el BOT. Solo el comando /dondeveo puede utilizarse sin login.
+      
+      Para loguearte en el bot, utiliza el comando /login. Tus credenciales son las mismas que tu perfil de JellyFin.
+  
+      Para pedir contenido, utiliza el comando /pedir. Si quieres agilizar el proceso, puedes agregar tu peticion al comando. Por ejemplo /pedir serie Supernatural
+  
+      Para reportar un error, utiliza el comando /error. El BOT te notificara cuando sea resuelto.
+  
+      Utiliza el comando /notificaciones para configurar que mensajes quieres recibir.
+  
+      El comando /dondeveo te será util para saber en que plataforma de streaming encontrar una serie o pelicula. Puedes buscar mas rapido agregando tu consulta. Por ejemplo /dondeveo Supernatural
+      `,
+    });
+  });
+
   bot.command('login', async (ctx) => {
     if (ctx.session.isLoggedIn) {
       await ctx.reply('Ya estas logueado :)');
@@ -86,17 +104,17 @@ const setCommands = (bot: Bot<MyContext>) => {
     await ctx.conversation.enter('whereTo');
   });
 
-  bot.command("notificaciones", async (ctx) => {
+  bot.command('notificaciones', async (ctx) => {
     const loggedIn = await validateLogin(ctx);
     if (loggedIn) await ctx.conversation.enter('botConfig');
   });
 
-//   bot.command('config', async (ctx) => {
-//     const loggedIn = await validateLogin(ctx);
+  //   bot.command('config', async (ctx) => {
+  //     const loggedIn = await validateLogin(ctx);
 
-//     if (loggedIn) ctx.conversation.enter('login');
-//     // if (loggedIn) ctx.reply('En construccion...');
-//   });
+  //     if (loggedIn) ctx.conversation.enter('login');
+  //     // if (loggedIn) ctx.reply('En construccion...');
+  //   });
 };
 
 export default function setupBot() {
