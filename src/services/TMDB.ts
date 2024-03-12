@@ -1,6 +1,7 @@
 import { ApiResponse } from '../types';
 import {
   MediaType,
+  ReleaseDates,
   TmdbFindResponse,
   TmdbMovieResponse,
   TmdbSearchMediaResponse,
@@ -18,6 +19,7 @@ export default class TmbdService extends ApiService {
       token: process.env.TMDB_API,
       params: {
         language: 'es-MX',
+        append_to_response: 'release_dates,videos',
       },
     });
   }
@@ -41,12 +43,7 @@ export default class TmbdService extends ApiService {
   ): Promise<T | null> {
     try {
       const { data } = await this.conector.get<ApiResponse<T>>(
-        this.getUrl(ids, type),
-        {
-          params: {
-            append_to_response: 'videos',
-          },
-        }
+        this.getUrl(ids, type)
       );
 
       if (data.success) {
@@ -176,6 +173,20 @@ export default class TmbdService extends ApiService {
       this.log.error('Error getting trailer', error);
 
       return;
+    }
+  }
+
+  public getMPA(releaseDates: ReleaseDates[]): string {
+    try {
+      return (
+        releaseDates
+          .find((rd) => rd.iso_3166_1 == 'US')
+          ?.release_dates.find((rd) => rd.type == 3)?.certification || 'UNKNOWN'
+      );
+    } catch (error: any) {
+      this.log.error('Error getting MPA', error);
+
+      return 'UNKNOWN';
     }
   }
 }

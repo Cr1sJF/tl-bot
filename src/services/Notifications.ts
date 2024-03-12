@@ -107,6 +107,7 @@ export default class NotificationService {
         rating: tmdbMovie.vote_average,
         trailer: TMDB.getTrailer(tmdbMovie.videos.results),
         year: tmdbMovie.release_date,
+        MPAARating: TMDB.getMPA(tmdbMovie.release_dates.results),
       });
 
       await this.notifyViaMessage(movie, 'movie');
@@ -141,6 +142,7 @@ export default class NotificationService {
         status: tmdbShow.status,
         from: tmdbShow.first_air_date,
         to: tmdbShow.last_air_date,
+        MPAARating: TMDB.getMPA(tmdbShow.release_dates.results),
       });
 
       await this.notifyViaMessage(show, 'tv');
@@ -184,6 +186,7 @@ export default class NotificationService {
         season: season.season_number,
         year: tmdbSeason.air_date,
         episodes: tmdbSeason.episodes,
+        MPAARating: TMDB.getMPA(tmdbShow.release_dates.results),
       });
 
       await this.notifyViaMessage(show, 'season');

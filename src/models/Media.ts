@@ -21,6 +21,7 @@ export default class Media implements IMediaData {
   runtime?: string | undefined;
   rating: string;
   trailer?: string;
+  MPAARating: string;
 
   constructor(data: IMediaData) {
     this.id = data.id;
@@ -34,5 +35,6 @@ export default class Media implements IMediaData {
     this.rating = Number(data.rating).toFixed(2);
 
     this.trailer = data.trailer;
+    this.MPAARating = data.MPAARating;
   }
 }

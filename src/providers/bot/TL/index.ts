@@ -108,13 +108,6 @@ const setCommands = (bot: Bot<MyContext>) => {
     const loggedIn = await validateLogin(ctx);
     if (loggedIn) await ctx.conversation.enter('botConfig');
   });
-
-  //   bot.command('config', async (ctx) => {
-  //     const loggedIn = await validateLogin(ctx);
-
-  //     if (loggedIn) ctx.conversation.enter('login');
-  //     // if (loggedIn) ctx.reply('En construccion...');
-  //   });
 };
 
 export default function setupBot() {

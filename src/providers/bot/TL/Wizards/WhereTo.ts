@@ -28,13 +28,18 @@ const whereToBuilder = async (
     );
   } else {
     await ctx.reply('¿En que pais estas?', {
-      reply_markup: new Keyboard().text('AR').text('CL').oneTime(true),
+      reply_markup: new Keyboard().text('AR').text('CL').resized().oneTime(true),
     });
 
     const countryResponse = await conversation.waitFor(':text');
 
     const country = countryResponse.message?.text;
 
+    await ctx.reply('Un momento, por favor...', {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    });
     const streamingService = new StreamingService();
     const streamingData: StreamingAvailability[] = await streamingService.get(
       mediaData.mediaId,

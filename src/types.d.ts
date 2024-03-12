@@ -38,6 +38,7 @@ export interface IMediaData {
   rating: string | number;
   runtime?: string | number;
   trailer?: string;
+  MPAARating: string;
 }
 
 export interface IMovieData extends IMediaData {
