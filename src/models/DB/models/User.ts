@@ -60,11 +60,13 @@ export default class User extends BaseModel {
     }
   }
 
-  public static async find(): Promise<User[]> {
+  public static async find(include?: string): Promise<User[]> {
     try {
       const repo = User.getInstance<User>();
 
-      const records = await repo.find();
+      const records = await repo.find({
+        relations: [include || ''],
+      });
 
       return records;
     } catch (error) {

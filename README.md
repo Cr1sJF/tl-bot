@@ -1,5 +1,5 @@
 TODO:
-- MPAA
+- MPAA OK
 - Info MPAA
 - whereTo -> Buscar tambien en jellyfin
 - Indicar coleccion donde se agrego algo

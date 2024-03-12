@@ -17,6 +17,13 @@ import JellyfinService from './Jellyfin';
 import MessageService from './Message';
 import TmbdService from './TMDB';
 
+const MEDIA_NOTIFICATION_MAP = {
+  movie: 'PELICULAS',
+  tv: 'SERIES',
+  season: 'TEMPORADAS',
+  episode: 'EPISODIOS',
+};
+
 const TMDB = new TmbdService();
 export default class NotificationService {
   messageService = new MessageService();
@@ -64,22 +71,28 @@ export default class NotificationService {
   private async notifyViaBot(media: AnyMediaData, type: MediaType) {
     const message = this.getMessage(media, type);
 
-    const destinations = await User.find();
+    const destinations = await User.find('notifications');
 
     for (const provider of this.botProviders) {
       for (const destination of destinations) {
         try {
-          const result = await provider.send(
-            {
-              message,
-              image: media.posterUrl,
-            },
-            destination.chatId
-          );
+          const typeToFind = MEDIA_NOTIFICATION_MAP[type];
 
-          this.log.info(
-            `Message trough provider ${provider.constructor.name} to user ${destination.name}: ${result}`
-          );
+          if (
+            destination.notifications.some((notif) => notif.type == typeToFind)
+          ) {
+            const result = await provider.send(
+              {
+                message,
+                image: media.posterUrl,
+              },
+              destination.chatId
+            );
+
+            this.log.info(
+              `Message trough provider ${provider.constructor.name} to user ${destination.name}: ${result}`
+            );
+          }
         } catch (error) {
           this.log.error(
             `Error sending message trough provider ${provider.constructor.name} to user ${destination.name}`
