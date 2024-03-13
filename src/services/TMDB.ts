@@ -1,5 +1,6 @@
 import { ApiResponse } from '../types';
 import {
+  ContentRating,
   MediaType,
   ReleaseDates,
   TmdbFindResponse,
@@ -19,7 +20,7 @@ export default class TmbdService extends ApiService {
       token: process.env.TMDB_API,
       params: {
         language: 'es-MX',
-        append_to_response: 'release_dates,videos',
+        append_to_response: 'release_dates,videos,content_ratings',
       },
     });
   }
@@ -181,12 +182,24 @@ export default class TmbdService extends ApiService {
       return (
         releaseDates
           .find((rd) => rd.iso_3166_1 == 'US')
-          ?.release_dates.find((rd) => rd.type == 3)?.certification || 'UNKNOWN'
+          ?.release_dates.find((rd) => rd.type == 3)?.certification || '🤷‍♂️'
       );
     } catch (error: any) {
       this.log.error('Error getting MPA', error);
 
-      return 'UNKNOWN';
+      return '🤷‍♂️';
+    }
+  }
+
+  public getContentRating(contentRatings: ContentRating[]): string {
+    try {
+      return (
+        contentRatings.find((cr) => cr.iso_3166_1 == 'US')?.rating || '🤷‍♂️'
+      );
+    } catch (error: any) {
+      this.log.error('Error getting content rating', error);
+
+      return '🤷‍♂️';
     }
   }
 }

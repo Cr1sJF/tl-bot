@@ -72,10 +72,6 @@ export interface TmdbResponseBase {
   videos: {
     results: VideoInfo[];
   };
-
-  release_dates: {
-    results: ReleaseDates[];
-  };
 }
 
 export interface TmdbMovieResponse extends TmdbResponseBase {
@@ -88,6 +84,10 @@ export interface TmdbMovieResponse extends TmdbResponseBase {
   title: string;
   video: boolean;
   vote_count: number;
+
+  release_dates: {
+    results: ReleaseDates[];
+  };
 }
 
 export interface TmdbVideoResponse {
@@ -134,6 +134,16 @@ export interface TmdbShowResponse extends TmdbResponseBase {
   }[];
   type: string;
   vote_count: number;
+
+  content_ratings: {
+    results: ContentRating[];
+  };
+}
+
+export interface ContentRating {
+  descriptors: string[];
+  iso_3166_1: string;
+  rating: string;
 }
 
 export interface TmdbSeasonResponse {

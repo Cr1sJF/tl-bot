@@ -32,7 +32,7 @@ export default class Media implements IMediaData {
     this.genres =
       typeof data.genres === 'string' ? data.genres : data.genres.join(' | ');
     this.runtime = formatTime(Number(data.runtime));
-    this.rating = Number(data.rating).toFixed(2);
+    this.rating = data.rating && Number(data.rating).toFixed(2) || "🤷‍♂️";
 
     this.trailer = data.trailer;
     this.MPAARating = data.MPAARating;
