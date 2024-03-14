@@ -124,7 +124,6 @@ export interface JellyfinBaseItem {
   };
   RunTimeTicks: number;
   ServerId: string;
-  Type: string;
   UserData: {
     IsFavorite: boolean;
     Key: string;
@@ -140,6 +139,7 @@ export interface JellyfinMovieItem extends JellyfinBaseItem {
   HasSubtitles: boolean;
   MediaType: string;
   VideoType: string;
+  Type: "Movie";
 }
 
 export interface JellifynShowItem extends JellyfinBaseItem {
@@ -158,6 +158,7 @@ export interface JellifynShowItem extends JellyfinBaseItem {
     Played: boolean;
     UnplayedItemCount: number;
   };
+  Type: "Series"
 }
 
 export interface JellyfinResponse<T> {

@@ -1,6 +1,7 @@
 import { Keyboard } from 'grammy';
 import {
   IMAGES,
+  IdentifiedMedia,
   getTypeAndQuery,
   identifyMedia,
   identifyMediaExpress,
@@ -9,12 +10,15 @@ import StreamingService from '../../../../services/Streaming';
 import { StreamingAvailability } from '../../../../types/Streaming';
 import MessageService from '../../../../services/Message';
 import { ConversationContext, MyContext } from '..';
+import JellyfinService from '../../../../services/Jellyfin';
+
+const jellyfin = new JellyfinService();
 
 const whereToBuilder = async (
   conversation: ConversationContext,
   ctx: MyContext
 ) => {
-  let mediaData;
+  let mediaData: IdentifiedMedia;
   if (ctx.match) {
     const { type, query } = getTypeAndQuery(ctx.match as string);
     mediaData = await identifyMediaExpress(ctx, conversation, type, query);
@@ -28,7 +32,11 @@ const whereToBuilder = async (
     );
   } else {
     await ctx.reply('¿En que pais estas?', {
-      reply_markup: new Keyboard().text('AR').text('CL').resized().oneTime(true),
+      reply_markup: new Keyboard()
+        .text('AR')
+        .text('CL')
+        .resized()
+        .oneTime(true),
     });
 
     const countryResponse = await conversation.waitFor(':text');
@@ -41,17 +49,36 @@ const whereToBuilder = async (
       },
     });
     const streamingService = new StreamingService();
-    const streamingData: StreamingAvailability[] = await streamingService.get(
-      mediaData.mediaId,
-      mediaData.type as 'tv' | 'movie',
-      country?.toLocaleLowerCase() as 'ar' | 'cl'
+    const streamingData: StreamingAvailability[] = await conversation.external(
+      async () =>
+        streamingService.get(
+          mediaData.mediaId,
+          mediaData.type as 'tv' | 'movie',
+          country?.toLocaleLowerCase() as 'ar' | 'cl'
+        )
     );
 
-    if (!streamingData || !streamingData.length) {
+    const jellyData = await conversation.external(async () =>
+      jellyfin.jellifynAvailability(
+        mediaData.mediaId,
+        mediaData.name,
+        mediaData.type == 'tv' ? 'Series' : 'Movie',
+        ctx.session.userId
+      )
+    );
+
+    if ((!streamingData || !streamingData.length) && !jellyData) {
       await ctx.replyWithAnimation(IMAGES.ERROR, {
         caption: `No encontré servicios de streaming que tengan la ${mediaData.type} disponible`,
       });
       return;
+    }
+
+    if (jellyData) {
+      streamingData.push({
+        streamingPlatform: 'Jellyfin',
+        link: jellyData,
+      });
     }
 
     const messageService = new MessageService();

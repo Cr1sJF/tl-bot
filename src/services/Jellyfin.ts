@@ -1,6 +1,11 @@
 import Log from '../models/Loggers/Logger';
 import { ApiResponse } from '../types';
-import { JellyfinResponse, UserResponse } from '../types/jellyfin';
+import {
+  JellifynShowItem,
+  JellyfinMovieItem,
+  JellyfinResponse,
+  UserResponse,
+} from '../types/jellyfin';
 import ApiService from './Api';
 
 const log = new Log('JellyfinService');
@@ -13,6 +18,41 @@ export default class JellyfinService extends ApiService {
         Authorization: process.env.JELLYFIN_TOKEN,
       },
     });
+  }
+
+  public async search<T>(
+    query: string,
+    type?: 'Movie' | 'Series',
+    userId?: string
+  ): Promise<(JellyfinMovieItem | JellifynShowItem)[]> {
+    try {
+      const { data } = await this.conector.get<
+        ApiResponse<JellyfinResponse<JellyfinMovieItem | JellifynShowItem>>
+      >('/Items', {
+        params: {
+          recursive: true,
+          fields: 'ProviderIds',
+          searchTerm: query,
+          userId: userId || undefined,
+        },
+      });
+
+      if (data.success) {
+        if (type) {
+          return data.data.Items.filter((item) => item.Type === type);
+        } else {
+          return data.data.Items;
+        }
+      } else {
+        log.error('Error searching in jellyfin', data);
+
+        return [];
+      }
+    } catch (error: any) {
+      log.error('Error searching in jellyfin', error);
+
+      return [];
+    }
   }
 
   public async getItem<T>(id: string): Promise<JellyfinResponse<T> | null> {
@@ -92,4 +132,25 @@ export default class JellyfinService extends ApiService {
   //     return null;
   //   }
   // }
+
+  public async jellifynAvailability(
+    tmdbId: string,
+    query: string,
+    type?: 'Movie' | 'Series',
+    userId?: string
+  ): Promise<string> {
+    try {
+      const items = await this.search(query, type, userId);
+
+      const found = items.find((item) => item.ProviderIds.Tmdb === tmdbId);
+
+      return found
+        ? `${process.env.JELLY_URL}/web/index.html#!/details?id=${found.Id}`
+        : '';
+    } catch (error: any) {
+      log.error('Error finding show by id', error);
+
+      return '';
+    }
+  }
 }
