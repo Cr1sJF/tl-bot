@@ -1,6 +1,6 @@
 import Log from '../models/Loggers/Logger';
 import { ApiResponse } from '../types';
-import { JellyfinResponse } from '../types/jellyfin';
+import { JellyfinResponse, UserResponse } from '../types/jellyfin';
 import ApiService from './Api';
 
 const log = new Log('JellyfinService');
@@ -46,7 +46,7 @@ export default class JellyfinService extends ApiService {
     password: string
   ): Promise<string | null> {
     try {
-      const { data } = await this.conector.post<ApiResponse<any>>(
+      const { data } = await this.conector.post<ApiResponse<UserResponse>>(
         '/Users/AuthenticateByName',
         {
           Username: username,
@@ -78,4 +78,18 @@ export default class JellyfinService extends ApiService {
       return null;
     }
   }
+
+  // public async findByTmdbId(
+  //   id: string,
+  //   name: string
+  // ): Promise<JellyfinResponse<any> | null> {
+  //   try {
+  //     const items = await this.conector.get()
+
+  //   } catch (error: any) {
+  //     log.error('Error finding show by id', error);
+
+  //     return null;
+  //   }
+  // }
 }

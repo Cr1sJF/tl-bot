@@ -39,6 +39,7 @@ const loginBuilder = async (
 
   if (loginStatus) {
     conversation.session.isLoggedIn = true;
+    conversation.session.userId = loginStatus;
     await conversation.external(async () => {
       const user = new User();
       user.chatId = ctx.chat!.id!;

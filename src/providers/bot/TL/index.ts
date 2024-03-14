@@ -32,7 +32,7 @@ const setConversation = (bot: Bot<any>) => {
 
 const setSession = async (bot: Bot<MyContext>) => {
   function initial(): SessionData {
-    return { isLoggedIn: false };
+    return { isLoggedIn: false, userId: '' };
   }
 
   const repo = Session.getInstance<Session>();
