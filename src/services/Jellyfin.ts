@@ -106,6 +106,29 @@ export default class JellyfinService extends ApiService {
     }
   }
 
+  public async updateCollections(
+    userId: string,
+    collections: string[] = [],
+    enableAllFolders: boolean = false
+  ): Promise<boolean> {
+    try {
+      await this.conector.post(`/Users/${userId}/Policy`, {
+        EnabledFolders: enableAllFolders ? [] : collections,
+        EnableAllFolders: enableAllFolders,
+        AuthenticationProviderId:
+          'Jellyfin.Server.Implementations.Users.DefaultAuthenticationProvider',
+        PasswordResetProviderId:
+          'Jellyfin.Server.Implementations.Users.DefaultPasswordResetProvider',
+      });
+
+      return true;
+    } catch (error: any) {
+      log.error('Error updating collections', error);
+
+      return false;
+    }
+  }
+
   public async getTmdbIdBySeason(id: string): Promise<string | null> {
     try {
       const itemResponse = await this.getItem<any>(id);
