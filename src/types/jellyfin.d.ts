@@ -118,6 +118,7 @@ export interface JellyfinBaseItem {
   OfficialRating: string;
   PremiereDate: string;
   ProductionYear: number;
+  ParentId: string;
   ProviderIds: {
     Imdb: string;
     Tmdb: string;

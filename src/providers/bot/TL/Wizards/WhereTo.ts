@@ -58,14 +58,18 @@ const whereToBuilder = async (
         )
     );
 
-    const jellyData = await conversation.external(async () =>
-      jellyfin.jellifynAvailability(
-        mediaData.mediaId,
-        mediaData.name,
-        mediaData.type == 'tv' ? 'Series' : 'Movie',
-        ctx.session.userId
-      )
-    );
+    let jellyData;
+
+    if (conversation.session.isLoggedIn) {
+      jellyData = await conversation.external(async () =>
+        jellyfin.jellifynAvailability(
+          mediaData.mediaId,
+          mediaData.name,
+          mediaData.type == 'tv' ? 'Series' : 'Movie',
+          ctx.session.userId
+        )
+      );
+    }
 
     if ((!streamingData || !streamingData.length) && !jellyData) {
       await ctx.replyWithAnimation(IMAGES.ERROR, {
