@@ -13,7 +13,11 @@ import Session from '../../../models/DB/models/Session';
 import { TypeormAdapter } from '@grammyjs/storage-typeorm';
 import { IMAGES, logout, validateLogin } from './utils';
 import errorBuilder from './Wizards/Errors';
-import settingsBuilder from './Wizards/Settings';
+import {
+  notificationBuilder,
+  collectionBuilder,
+  settingsMenu,
+} from './Wizards/Settings';
 
 export type MyContext = Context &
   SessionFlavor<SessionData> &
@@ -27,12 +31,18 @@ const setConversation = (bot: Bot<any>) => {
   bot.use(createConversation(requestBuilder, 'request'));
   bot.use(createConversation(whereToBuilder, 'whereTo'));
   bot.use(createConversation(errorBuilder, 'error'));
-  bot.use(createConversation(settingsBuilder, 'botConfig'));
+  bot.use(createConversation(notificationBuilder, 'notifications'));
+  bot.use(createConversation(collectionBuilder, 'collections'));
 };
 
 const setSession = async (bot: Bot<MyContext>) => {
   function initial(): SessionData {
-    return { isLoggedIn: false, userId: '' };
+    return {
+      isLoggedIn: false,
+      userId: '',
+      collections: [],
+      enableAllFolders: false,
+    };
   }
 
   const repo = Session.getInstance<Session>();
@@ -104,15 +114,20 @@ const setCommands = (bot: Bot<MyContext>) => {
     await ctx.conversation.enter('whereTo');
   });
 
-  bot.command('notificaciones', async (ctx) => {
+  bot.command('configuracion', async (ctx) => {
     const loggedIn = await validateLogin(ctx);
-    if (loggedIn) await ctx.conversation.enter('botConfig');
+    if (loggedIn) {
+      await ctx.reply('Selecciona una opcion del menu', {
+        reply_markup: settingsMenu,
+      });
+    }
   });
 };
 
 export default function setupBot() {
   const bot = new Bot<MyContext>(process.env.TL_BOT_ID!);
 
+  bot.use(settingsMenu);
   setSession(bot);
   setConversation(bot);
   setCommands(bot);

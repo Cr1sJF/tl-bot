@@ -28,6 +28,9 @@ export default class User extends BaseModel {
   @Column()
   lastName!: string;
 
+  @Column()
+  country!: string;
+
   @OneToMany(() => Report, (report) => report.user)
   reports!: Report[];
 

@@ -1,7 +1,7 @@
 import JellyfinService from '../../../../services/Jellyfin';
 import { ConversationContext, MyContext } from '..';
 import User from '../../../../models/DB/models/User';
-import { InputFile } from 'grammy';
+import { InputFile, Keyboard } from 'grammy';
 import path from 'path';
 import { IMAGES } from '../utils';
 
@@ -33,25 +33,46 @@ const loginBuilder = async (
     caption: 'Estoy validando tus credenciales...',
   });
 
-  const loginStatus = await conversation.external(
+  const jellyfinUser = await conversation.external(
     async () => await jellyFin.login(user.trim(), password.trim())
   );
 
-  if (loginStatus) {
+  if (jellyfinUser) {
+    await ctx.reply(
+      'Por favor, indica tu pais actual (Esta información se utilizará para mejorar los resultados de busquedas de contenido)',
+      {
+        reply_markup: new Keyboard()
+          .text('AR')
+          .text('CL')
+          .text('OMITIR')
+          .oneTime()
+          .resized(),
+      }
+    );
+
+    const countryResponse = await conversation.waitFor(':text');
+    const country = countryResponse.message?.text;
+
     conversation.session.isLoggedIn = true;
-    conversation.session.userId = loginStatus;
+    conversation.session.userId = jellyfinUser.User.Id;
+    conversation.session.collections = jellyfinUser.User.Policy.EnabledFolders;
+    conversation.session.enableAllFolders =
+      jellyfinUser.User.Policy.EnableAllFolders;
+    conversation.session.country = country != 'OMITIR' ? country : undefined;
     await conversation.external(async () => {
       const user = new User();
       user.chatId = ctx.chat!.id!;
-      user.jellyId = loginStatus;
+      user.jellyId = jellyfinUser.User.Id;
       user.name = ctx.from?.first_name || 'anonimo';
       user.lastName = ctx.from?.last_name || 'anonimo';
-
+      user.country = country && country != 'OMITIR' ? country : '';
       const repo = User.getInstance<User>();
       await repo.upsert(user, ['chatId']);
     });
 
-    await ctx.replyWithAnimation(IMAGES.OK, { caption: 'Login exitoso. Bienvenido!' });
+    await ctx.replyWithAnimation(IMAGES.OK, {
+      caption: 'Login exitoso. Bienvenido!',
+    });
     return true;
   } else {
     await ctx.replyWithAnimation(IMAGES.ERROR, { caption: 'Login fallido' });

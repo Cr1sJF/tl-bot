@@ -84,7 +84,7 @@ export default class JellyfinService extends ApiService {
   public async login(
     username: string,
     password: string
-  ): Promise<string | null> {
+  ): Promise<UserResponse | null> {
     try {
       const { data } = await this.conector.post<ApiResponse<UserResponse>>(
         '/Users/AuthenticateByName',
@@ -95,7 +95,7 @@ export default class JellyfinService extends ApiService {
       );
 
       if (data.success) {
-        return data.data.User.Id as string;
+        return data.data;
       } else {
         return null;
       }

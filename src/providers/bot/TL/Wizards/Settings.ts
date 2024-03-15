@@ -1,7 +1,27 @@
 import { Keyboard } from 'grammy';
+import { Menu } from '@grammyjs/menu';
 import { ConversationContext, MyContext } from '..';
 import Notification from '../../../../models/DB/models/Notification';
 import User from '../../../../models/DB/models/User';
+
+export const settingsMenu = new Menu<MyContext>('settingsMenu')
+  .text(
+    'Notificaciones',
+    async (ctx) => await ctx.conversation.enter('notifications')
+  )
+  .row()
+  .text(
+    'Colecciones',
+    async (ctx) => await ctx.conversation.enter('collections')
+  )
+  .row()
+  .text(
+    'Salir',
+    async (ctx) =>
+      await ctx.reply('Saliendo...', {
+        reply_markup: { remove_keyboard: true },
+      })
+  );
 
 const buildKeyboard = (
   settings: Notification[],
@@ -28,7 +48,7 @@ const buildKeyboard = (
   return keyboard;
 };
 
-const settingsBuilder = async (
+export const notificationBuilder = async (
   conversation: ConversationContext,
   ctx: MyContext
 ) => {
@@ -104,4 +124,10 @@ const settingsBuilder = async (
   return;
 };
 
-export default settingsBuilder;
+export const collectionBuilder = async (
+  conversation: ConversationContext,
+  ctx: MyContext
+) => {
+  await ctx.reply('En construccion...');
+};
+
