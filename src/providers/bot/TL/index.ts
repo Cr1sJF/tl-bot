@@ -158,6 +158,8 @@ export default function setupBot() {
   // setMenu(bot);
   bot.start();
 
+  console.info("JellyBot's bot is ready!");
+
   bot.catch((err) => {
     const ctx = err.ctx;
     console.error(`Error while handling update ${ctx.update.update_id}:`);
