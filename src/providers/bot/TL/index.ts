@@ -40,7 +40,7 @@ const setConversation = (bot: Bot<any>) => {
   bot.use(createConversation(requestBuilder, 'request'));
   bot.use(createConversation(whereToBuilder, 'whereTo'));
   bot.use(createConversation(errorBuilder, 'error'));
-  bot.use(createConversation(notificationBuilder, 'notifications'));
+  // bot.use(createConversation(notificationBuilder, 'notifications'));
   bot.use(createConversation(profileBuilder, 'profile'));
 
   // bot.use(createConversation(collectionBuilder, 'collections'));
@@ -74,7 +74,9 @@ const setSession = async (bot: Bot<MyContext>) => {
 
 const setCommands = (bot: Bot<MyContext>) => {
   bot.command('start', (ctx) => {
-    ctx.reply('Hello!');
+    ctx.replyWithAnimation(IMAGES.HI, {
+      caption: `Hola! Soy JellyBot. Estoy para ayudarte a mejorar tu experiencia con el servidor. Utiliza el comando /help para ver mis comandos.`,
+    });
   });
 
   bot.command('help', async (ctx) => {
@@ -82,15 +84,15 @@ const setCommands = (bot: Bot<MyContext>) => {
       caption: `
     Utiliza los comandos para interactuar con el BOT. Solo el comando /dondeveo puede utilizarse sin login.
     
-    Para loguearte en el bot, utiliza el comando /login. Tus credenciales son las mismas que tu perfil de JellyFin.
+    Para loguearte en el bot, utiliza el comando /login. Tus credenciales son las mismas que tu perfil de JellyFin. Puedes agilizar el proceso enviando tus credenciales junto al comando. por ejemplo, /login usuario contraseña
 
     Para pedir contenido, utiliza el comando /pedir. Si quieres agilizar el proceso, puedes agregar tu peticion al comando. Por ejemplo /pedir serie Supernatural
 
-    Para reportar un error, utiliza el comando /error. El BOT te notificara cuando sea resuelto.
-
-    Utiliza el comando /notificaciones para configurar que mensajes quieres recibir.
-
     El comando /dondeveo te será util para saber en que plataforma de streaming encontrar una serie o pelicula. Puedes buscar mas rapido agregando tu consulta. Por ejemplo /dondeveo Supernatural
+
+    Para reportar un error, utiliza el comando /error. El BOT te notificara cuando sea resuelto.
+    
+    Utiliza el comando /perfil para ver tus datos.
     `,
     });
   });
@@ -153,7 +155,7 @@ export default function setupBot() {
   setConversation(bot);
   setCommands(bot);
 
-  setMenu(bot);
+  // setMenu(bot);
   bot.start();
 
   bot.catch((err) => {

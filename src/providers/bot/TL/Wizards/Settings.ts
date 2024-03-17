@@ -4,6 +4,8 @@ import { ConversationContext, MyContext } from '..';
 import Notification from '../../../../models/DB/models/Notification';
 import User from '../../../../models/DB/models/User';
 
+let SETTINGS: Notification[] = [];
+
 const toggleNotification = (ctx: MyContext, type: string) => {
   const notif = ctx.session.notifications.find((notif) => notif == type);
   if (notif) {
@@ -16,11 +18,11 @@ const toggleNotification = (ctx: MyContext, type: string) => {
 };
 
 export const getMenu = async () => {
-  const settings = await Notification.getInstance<Notification>().find();
+  SETTINGS = await Notification.getInstance<Notification>().find();
 
   const menu = new Menu<MyContext>('notifications_menu');
 
-  settings.forEach((setting, index) => {
+  SETTINGS.forEach((setting, index) => {
     menu.text(
       (ctx) => {
         const active = ctx.session.notifications.find(

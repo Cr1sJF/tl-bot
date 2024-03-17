@@ -30,7 +30,7 @@ const requestBuilder = async (
   }
 
   let season: number | undefined = undefined;
-  if (media.type == 'SERIE') {
+  if (media.type == 'tv') {
     await ctx.reply('¿Alguna temporada particular?', {
       reply_markup: getYesNoKeyboard(),
     });

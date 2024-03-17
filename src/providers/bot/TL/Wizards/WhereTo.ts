@@ -31,17 +31,21 @@ const whereToBuilder = async (
       'No se ha podido identificar el tipo de contenido. Intenta nuevamente'
     );
   } else {
-    await ctx.reply('¿En que pais estas?', {
-      reply_markup: new Keyboard()
-        .text('AR')
-        .text('CL')
-        .resized()
-        .oneTime(true),
-    });
+    let country = '';
 
-    const countryResponse = await conversation.waitFor(':text');
-
-    const country = countryResponse.message?.text;
+    if (conversation.session.country) {
+      country = conversation.session.country;
+    } else {
+      await ctx.reply('¿En que pais estas?', {
+        reply_markup: new Keyboard()
+          .text('AR')
+          .text('CL')
+          .resized()
+          .oneTime(true),
+      });
+      const countryResponse = await conversation.waitFor(':text');
+      country = countryResponse.message?.text!;
+    }
 
     await ctx.reply('Un momento, por favor...', {
       reply_markup: {
