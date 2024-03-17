@@ -1,4 +1,4 @@
-import { Context, InlineKeyboard, InputFile, Keyboard } from 'grammy';
+import { InputFile, Keyboard } from 'grammy';
 import Log from '../../../models/Loggers/Logger';
 import MessageService from '../../../services/Message';
 import { TmdbSearchMediaResponse } from '../../../types/TMDB';
@@ -70,9 +70,9 @@ export const getYesNoKeyboard = () => {
   return keyboard;
 };
 
-const validateType = (type: string) => {
-  return type === 'SERIE' || type === 'PELICULA';
-};
+// const validateType = (type: string) => {
+//   return type === 'SERIE' || type === 'PELICULA';
+// };
 
 export const getTypeAndQuery = (match: string) => {
   let type: string = '',

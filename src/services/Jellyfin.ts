@@ -20,7 +20,7 @@ export default class JellyfinService extends ApiService {
     });
   }
 
-  public async search<T>(
+  public async search(
     query: string,
     type?: 'Movie' | 'Series',
     userId?: string

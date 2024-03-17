@@ -17,12 +17,12 @@ import JellyfinService from './Jellyfin';
 import MessageService from './Message';
 import TmbdService from './TMDB';
 
-const MEDIA_NOTIFICATION_MAP = {
-  movie: 'PELICULAS',
-  tv: 'SERIES',
-  season: 'TEMPORADAS',
-  episode: 'EPISODIOS',
-};
+// const MEDIA_NOTIFICATION_MAP = {
+//   movie: 'PELICULAS',
+//   tv: 'SERIES',
+//   season: 'TEMPORADAS',
+//   episode: 'EPISODIOS',
+// };
 
 const TMDB = new TmbdService();
 export default class NotificationService {

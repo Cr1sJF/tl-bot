@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import fs from 'fs';
 import path from 'path';
-import User from '../models/DB/models/User';
+// import User from '../models/DB/models/User';
 
 let DB_INSTANCE: DataSource;
 

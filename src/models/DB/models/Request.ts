@@ -4,7 +4,6 @@ import {
   Column,
   ManyToOne,
   ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import Status, { STATUS } from './Status';
 import BaseModel from './BaseModel';

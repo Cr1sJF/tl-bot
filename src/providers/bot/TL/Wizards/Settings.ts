@@ -1,8 +1,8 @@
-import { Keyboard } from 'grammy';
+// import { Keyboard } from 'grammy';
 import { Menu } from '@grammyjs/menu';
 import { ConversationContext, MyContext } from '..';
 import Notification from '../../../../models/DB/models/Notification';
-import User from '../../../../models/DB/models/User';
+// import User from '../../../../models/DB/models/User';
 
 let SETTINGS: Notification[] = [];
 
@@ -57,7 +57,7 @@ export const getMenu = async () => {
 };
 
 export const notificationBuilder = async (
-  conversation: ConversationContext,
+  _: ConversationContext,
   ctx: MyContext
 ) => {
   try {

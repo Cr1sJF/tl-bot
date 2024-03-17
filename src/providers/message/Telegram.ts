@@ -35,7 +35,7 @@ export default class TelegramMessageProvider extends MessageProvider {
       return false;
     }
   }
-  sendToUser(message: string, chatId: string | number): Promise<boolean> {
+  sendToUser(_: string, __: string | number): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

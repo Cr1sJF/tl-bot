@@ -20,12 +20,12 @@ import Session from '../../../models/DB/models/Session';
 import { TypeormAdapter } from '@grammyjs/storage-typeorm';
 import { IMAGES, logout, validateLogin } from './utils';
 import errorBuilder from './Wizards/Errors';
-import {
-  getMenu,
-  notificationBuilder,
-  // collectionBuilder,
-  // settingsMenu,
-} from './Wizards/Settings';
+// import {
+//   getMenu,
+//   // notificationBuilder,
+//   // collectionBuilder,
+//   // settingsMenu,
+// } from './Wizards/Settings';
 import profileBuilder from './Wizards/Profile';
 
 export type MyContext = Context &
@@ -134,18 +134,18 @@ const setCommands = (bot: Bot<MyContext>) => {
   });
 };
 
-const setMenu = async (bot: Bot<MyContext>) => {
-  const menu = await getMenu();
-  bot.use(menu);
+// const setMenu = async (bot: Bot<MyContext>) => {
+//   const menu = await getMenu();
+//   bot.use(menu);
 
-  bot.command('notificaciones', async (ctx) => {
-    const loggedIn = await validateLogin(ctx);
-    if (loggedIn)
-      await ctx.reply('Activa o desactiva tus notificaciones', {
-        reply_markup: menu,
-      });
-  });
-};
+//   bot.command('notificaciones', async (ctx) => {
+//     const loggedIn = await validateLogin(ctx);
+//     if (loggedIn)
+//       await ctx.reply('Activa o desactiva tus notificaciones', {
+//         reply_markup: menu,
+//       });
+//   });
+// };
 
 export default function setupBot() {
   const bot = new Bot<MyContext>(process.env.TL_BOT_ID!);
