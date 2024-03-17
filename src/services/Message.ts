@@ -168,4 +168,25 @@ export default class MessageService {
 
     return msg;
   }
+
+  getRequestMessage(
+    data: {
+      name: string;
+      overview: string;
+      status: string;
+    }[]
+  ): string {
+    return data
+      .map((data) =>
+        this.buildHTML([
+          { type: 'name', value: data.name },
+          { type: TYPE_NEW_LINE },
+          { type: 'overview', value: data.overview },
+          { type: TYPE_NEW_LINE },
+          { type: TYPE_NEW_LINE },
+          { type: 'status', value: data.status },
+        ])
+      )
+      .join('\n---------------------\n');
+  }
 }

@@ -120,6 +120,23 @@ export default class User extends BaseModel {
     }
   }
 
+  public static async getRequests(chatId: number): Promise<Request[]> {
+    try {
+      const repo = User.getInstance();
+      const user = await repo.findOne({
+        where: {
+          chatId: chatId,
+        },
+        relations: ['requests', 'requests.status'],
+      });
+
+      return user?.requests || [];
+    } catch (error: any) {
+      User.log.db('Error getting requests', error);
+      return [];
+    }
+  }
+
   public static async saveNotification(user: User): Promise<boolean> {
     try {
       const repo = User.getInstance();

@@ -25,6 +25,9 @@ export default class Status extends BaseModel {
   @Column({ length: 100 })
   name!: string;
 
+  @Column({ length: 100 })
+  label!: string;
+
   @OneToMany(() => Request, (request) => request.status)
   requests!: Request[];
 

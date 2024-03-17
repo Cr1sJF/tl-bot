@@ -140,6 +140,8 @@ export interface TmdbShowResponse extends TmdbResponseBase {
   };
 }
 
+export type TmdbAnyResponse = TmdbMovieResponse | TmdbShowResponse;
+
 export interface ContentRating {
   descriptors: string[];
   iso_3166_1: string;

@@ -1,4 +1,11 @@
-import { Bot, Context, SessionFlavor, session } from 'grammy';
+import {
+  Bot,
+  Context,
+  GrammyError,
+  HttpError,
+  SessionFlavor,
+  session,
+} from 'grammy';
 import { SessionData, getSessionKey } from './session';
 import {
   Conversation,
@@ -15,9 +22,10 @@ import { IMAGES, logout, validateLogin } from './utils';
 import errorBuilder from './Wizards/Errors';
 import {
   notificationBuilder,
-  collectionBuilder,
-  settingsMenu,
+  // collectionBuilder,
+  // settingsMenu,
 } from './Wizards/Settings';
+import profileBuilder from './Wizards/Profile';
 
 export type MyContext = Context &
   SessionFlavor<SessionData> &
@@ -32,7 +40,9 @@ const setConversation = (bot: Bot<any>) => {
   bot.use(createConversation(whereToBuilder, 'whereTo'));
   bot.use(createConversation(errorBuilder, 'error'));
   bot.use(createConversation(notificationBuilder, 'notifications'));
-  bot.use(createConversation(collectionBuilder, 'collections'));
+  bot.use(createConversation(profileBuilder, 'profile'));
+
+  // bot.use(createConversation(collectionBuilder, 'collections'));
 };
 
 const setSession = async (bot: Bot<MyContext>) => {
@@ -68,18 +78,18 @@ const setCommands = (bot: Bot<MyContext>) => {
   bot.command('help', async (ctx) => {
     await ctx.replyWithAnimation(IMAGES.OK, {
       caption: `
-      Utiliza los comandos para interactuar con el BOT. Solo el comando /dondeveo puede utilizarse sin login.
-      
-      Para loguearte en el bot, utiliza el comando /login. Tus credenciales son las mismas que tu perfil de JellyFin.
-  
-      Para pedir contenido, utiliza el comando /pedir. Si quieres agilizar el proceso, puedes agregar tu peticion al comando. Por ejemplo /pedir serie Supernatural
-  
-      Para reportar un error, utiliza el comando /error. El BOT te notificara cuando sea resuelto.
-  
-      Utiliza el comando /notificaciones para configurar que mensajes quieres recibir.
-  
-      El comando /dondeveo te será util para saber en que plataforma de streaming encontrar una serie o pelicula. Puedes buscar mas rapido agregando tu consulta. Por ejemplo /dondeveo Supernatural
-      `,
+    Utiliza los comandos para interactuar con el BOT. Solo el comando /dondeveo puede utilizarse sin login.
+    
+    Para loguearte en el bot, utiliza el comando /login. Tus credenciales son las mismas que tu perfil de JellyFin.
+
+    Para pedir contenido, utiliza el comando /pedir. Si quieres agilizar el proceso, puedes agregar tu peticion al comando. Por ejemplo /pedir serie Supernatural
+
+    Para reportar un error, utiliza el comando /error. El BOT te notificara cuando sea resuelto.
+
+    Utiliza el comando /notificaciones para configurar que mensajes quieres recibir.
+
+    El comando /dondeveo te será util para saber en que plataforma de streaming encontrar una serie o pelicula. Puedes buscar mas rapido agregando tu consulta. Por ejemplo /dondeveo Supernatural
+    `,
     });
   });
 
@@ -114,25 +124,41 @@ const setCommands = (bot: Bot<MyContext>) => {
     await ctx.conversation.enter('whereTo');
   });
 
-  bot.command('configuracion', async (ctx) => {
+  bot.command('notificaciones', async (ctx) => {
     const loggedIn = await validateLogin(ctx);
-    if (loggedIn) {
-      await ctx.reply('Selecciona una opcion del menu', {
-        reply_markup: settingsMenu,
-      });
-    }
+    if (loggedIn) await ctx.reply('En construccion...');
+  });
+
+  bot.command('perfil', async (ctx) => {
+    const loggedIn = await validateLogin(ctx);
+    if (loggedIn) await ctx.conversation.enter('profile');
   });
 };
 
 export default function setupBot() {
   const bot = new Bot<MyContext>(process.env.TL_BOT_ID!);
 
-  bot.use(settingsMenu);
+  // bot.use(settingsMenu);
   setSession(bot);
   setConversation(bot);
   setCommands(bot);
 
   bot.start();
+
+  bot.catch((err) => {
+    const ctx = err.ctx;
+    console.error(`Error while handling update ${ctx.update.update_id}:`);
+    const e = err.error;
+    if (e instanceof GrammyError) {
+      console.error('Error in request:', e.description);
+    } else if (e instanceof HttpError) {
+      console.error('Could not contact Telegram:', e);
+    } else {
+      console.error('Unknown error:', e);
+    }
+
+    ctx.conversation.exit();
+  });
 
   return bot;
 }

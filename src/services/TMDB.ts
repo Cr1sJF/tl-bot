@@ -3,6 +3,7 @@ import {
   ContentRating,
   MediaType,
   ReleaseDates,
+  TmdbAnyResponse,
   TmdbFindResponse,
   TmdbMovieResponse,
   TmdbSearchMediaResponse,
@@ -144,6 +145,21 @@ export default class TmbdService extends ApiService {
     }
   }
 
+  public async getItems(
+    items: { id: string; type: MediaType }[]
+  ): Promise<TmdbAnyResponse[]> {
+    try {
+      const promises = items.map((item) => this.get(item.id, item.type));
+      const responses = await Promise.all(promises);
+      return responses.filter(
+        (response) => response !== null
+      ) as TmdbAnyResponse[];
+    } catch (error: any) {
+      this.log.error('Error get items', error);
+      return [];
+    }
+  }
+
   public parseImage(path: string): string {
     return IMG_URL + path;
   }
@@ -193,9 +209,7 @@ export default class TmbdService extends ApiService {
 
   public getContentRating(contentRatings: ContentRating[]): string {
     try {
-      return (
-        contentRatings.find((cr) => cr.iso_3166_1 == 'US')?.rating || '🤷‍♂️'
-      );
+      return contentRatings.find((cr) => cr.iso_3166_1 == 'US')?.rating || '🤷‍♂️';
     } catch (error: any) {
       this.log.error('Error getting content rating', error);
 
