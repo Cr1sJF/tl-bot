@@ -21,6 +21,7 @@ import { TypeormAdapter } from '@grammyjs/storage-typeorm';
 import { IMAGES, logout, validateLogin } from './utils';
 import errorBuilder from './Wizards/Errors';
 import {
+  getMenu,
   notificationBuilder,
   // collectionBuilder,
   // settingsMenu,
@@ -52,6 +53,7 @@ const setSession = async (bot: Bot<MyContext>) => {
       userId: '',
       collections: [],
       enableAllFolders: false,
+      notifications: [],
     };
   }
 
@@ -124,14 +126,22 @@ const setCommands = (bot: Bot<MyContext>) => {
     await ctx.conversation.enter('whereTo');
   });
 
-  bot.command('notificaciones', async (ctx) => {
-    const loggedIn = await validateLogin(ctx);
-    if (loggedIn) await ctx.reply('En construccion...');
-  });
-
   bot.command('perfil', async (ctx) => {
     const loggedIn = await validateLogin(ctx);
     if (loggedIn) await ctx.conversation.enter('profile');
+  });
+};
+
+const setMenu = async (bot: Bot<MyContext>) => {
+  const menu = await getMenu();
+  bot.use(menu);
+
+  bot.command('notificaciones', async (ctx) => {
+    const loggedIn = await validateLogin(ctx);
+    if (loggedIn)
+      await ctx.reply('Activa o desactiva tus notificaciones', {
+        reply_markup: menu,
+      });
   });
 };
 
@@ -143,6 +153,7 @@ export default function setupBot() {
   setConversation(bot);
   setCommands(bot);
 
+  setMenu(bot);
   bot.start();
 
   bot.catch((err) => {

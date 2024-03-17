@@ -6,6 +6,7 @@ export interface SessionData {
   collections: string[];
   enableAllFolders: boolean;
   country?: string;
+  notifications: string[];
 }
 
 export function getSessionKey(ctx: Context): string | undefined {
