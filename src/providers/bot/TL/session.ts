@@ -10,5 +10,5 @@ export interface SessionData {
 }
 
 export function getSessionKey(ctx: Context): string | undefined {
-  return ctx.from?.id.toString();
+  return ctx.from?.id.toString() || ctx.chat?.id.toString();
 }
