@@ -1,7 +1,7 @@
 import Router, { Request, Response } from 'express';
 const router = Router();
 
-router.post('/health', async (_: Request, res: Response) => {
+router.get('/health', async (_: Request, res: Response) => {
   res.send("OK");
 });
 
