@@ -16,8 +16,8 @@ export const profileBuilder = async (
     const keybard = new Keyboard()
       .text('PEDIDOS')
       .row()
-      .text('REPORTES')
-      .row()
+      // .text('REPORTES')
+      // .row()
       .text('SALIR')
       .resized()
       .oneTime();
