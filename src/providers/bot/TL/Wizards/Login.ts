@@ -1,8 +1,7 @@
 import JellyfinService from '../../../../services/Jellyfin';
 import { ConversationContext, MyContext } from '..';
 import User from '../../../../models/DB/models/User';
-import { InputFile, Keyboard } from 'grammy';
-import path from 'path';
+import { Keyboard } from 'grammy';
 import { IMAGES } from '../utils';
 
 const jellyFin = new JellyfinService();
@@ -33,8 +32,8 @@ const loginBuilder = async (
     caption: 'Estoy validando tus credenciales...',
   });
 
-  const jellyfinUser = await conversation.external(
-    async () => await jellyFin.login(user.trim(), password.trim())
+  const jellyfinUser = await conversation.external(async () =>
+    jellyFin.login(user.trim(), password.trim())
   );
 
   if (jellyfinUser) {
@@ -44,6 +43,7 @@ const loginBuilder = async (
         reply_markup: new Keyboard()
           .text('AR')
           .text('CL')
+          .row()
           .text('OMITIR')
           .oneTime()
           .resized(),
@@ -66,8 +66,9 @@ const loginBuilder = async (
       user.name = ctx.from?.first_name || 'anonimo';
       user.lastName = ctx.from?.last_name || 'anonimo';
       user.country = country && country != 'OMITIR' ? country : '';
+      user.active = true;
       const repo = User.getInstance<User>();
-      await repo.upsert(user, ['chatId']);
+      await repo.upsert(user, ['jellyId']);
     });
 
     await ctx.replyWithAnimation(IMAGES.OK, {

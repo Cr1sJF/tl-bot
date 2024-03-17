@@ -31,6 +31,9 @@ export default class User extends BaseModel {
   @Column()
   country!: string;
 
+  @Column()
+  active!: boolean;
+
   @OneToMany(() => Report, (report) => report.user)
   reports!: Report[];
 
@@ -85,6 +88,7 @@ export default class User extends BaseModel {
       const user = await repo.find({
         where: {
           chatId: chatId,
+          active: true,
         },
       });
 

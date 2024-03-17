@@ -263,11 +263,19 @@ export const validateLogin = async (ctx: MyContext): Promise<boolean> => {
 export const logout = async (ctx: MyContext) => {
   try {
     ctx.session.isLoggedIn = false;
-    await User.getInstance().delete({
-      chatId: ctx.chat?.id,
-    });
+    const repo = User.getInstance<User>();
+    await repo.update(
+      {
+        jellyId: ctx.session.userId,
+      },
+      {
+        active: false,
+      }
+    );
 
-    await ctx.replyWithAnimation(IMAGES.HI, {caption:'Sesión cerrada. Vuelve pronto!'});
+    await ctx.replyWithAnimation(IMAGES.HI, {
+      caption: 'Sesión cerrada. Vuelve pronto!',
+    });
   } catch (error: any) {
     ctx.reply('Ocurrio un error al cerrar la sesión');
     log.error('Error logging out', error);
