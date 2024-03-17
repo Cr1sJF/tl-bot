@@ -76,23 +76,23 @@ export default class NotificationService {
     for (const provider of this.botProviders) {
       for (const destination of destinations) {
         try {
-          const typeToFind = MEDIA_NOTIFICATION_MAP[type];
+          // const typeToFind = MEDIA_NOTIFICATION_MAP[type];
 
-          if (
-            destination.notifications.some((notif) => notif.type == typeToFind)
-          ) {
-            const result = await provider.send(
-              {
-                message,
-                image: media.posterUrl,
-              },
-              destination.chatId
-            );
+          // if (
+          //   destination.notifications.some((notif) => notif.type == typeToFind)
+          // ) {
+          const result = await provider.send(
+            {
+              message,
+              image: media.posterUrl,
+            },
+            destination.chatId
+          );
 
-            this.log.info(
-              `Message trough provider ${provider.constructor.name} to user ${destination.name}: ${result}`
-            );
-          }
+          this.log.info(
+            `Message trough provider ${provider.constructor.name} to user ${destination.name}: ${result}`
+          );
+          // }
         } catch (error) {
           this.log.error(
             `Error sending message trough provider ${provider.constructor.name} to user ${destination.name}`
