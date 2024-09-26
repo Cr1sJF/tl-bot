@@ -17,21 +17,21 @@ export default async (app: Application) => {
       .listen(port, () => {
         log.info(`✅ SERVER RUNNING ON PORT ${port}`);
 
-        setInterval(async () => {
-          try {
-            log.info('PING...');
-            const data = await axios.get(
-              'https://tl-bot-g5x5.onrender.com/utils/ping',
-              {
-                timeout: 0,
-              }
-            );
+        // setInterval(async () => {
+        //   try {
+        //     log.info('PING...');
+        //     const data = await axios.get(
+        //       'https://tl-bot-g5x5.onrender.com/utils/ping',
+        //       {
+        //         timeout: 0,
+        //       }
+        //     );
 
-            log.info(data.data);
-          } catch (error: any) {
-            log.error("Error in ping", error);
-          }
-        }, 30000);
+        //     log.info(data.data);
+        //   } catch (error: any) {
+        //     log.error("Error in ping", error);
+        //   }
+        // }, 30000);
       })
       .on('error', (err) => {
         log.error(err);
